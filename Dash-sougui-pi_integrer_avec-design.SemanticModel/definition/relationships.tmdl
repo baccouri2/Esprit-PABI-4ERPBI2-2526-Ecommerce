@@ -1,0 +1,134 @@
+relationship 0d9bf3de-25d8-4059-8ba0-c70a4557053e
+	joinOnDateBehavior: datePartOnly
+	fromColumn: dim_date.full_date
+	toColumn: LocalDateTable_9cbb6752-fb1f-4920-b39f-b44a2aafbb2c.Date
+
+relationship d0a3d2fe-0caf-4ddf-b517-a71620c33cbc
+	joinOnDateBehavior: datePartOnly
+	fromColumn: dim_order.date_commande
+	toColumn: LocalDateTable_07e92495-d310-40c4-8ee7-1806d20c4e1a.Date
+
+relationship AutoDetected_243a2625-2bdb-4a0c-95f2-cf4e21643ae0
+	fromColumn: fact_inventory.fk_date
+	toColumn: dim_date.pk_id_date
+
+relationship AutoDetected_4dcd3318-b3c5-46ba-ab0a-511fb1354815
+	fromColumn: fact_sale.fk_date
+	toColumn: dim_date.pk_id_date
+
+relationship AutoDetected_0534cb2a-f2b3-4d38-8a51-da31696f29e8
+	fromColumn: fact_purchace.fk_date
+	toColumn: dim_date.pk_id_date
+
+relationship AutoDetected_675822b4-142d-4d8b-9656-8cd8f78a62c7
+	fromColumn: fact_return.fk_date
+	toColumn: dim_date.pk_id_date
+
+relationship AutoDetected_e60a88c7-8400-443b-90e6-9d3b5869e2f0
+	fromColumn: dim_product.fk_category
+	toColumn: dim_category.pk_id_category
+
+relationship AutoDetected_2d42ffce-cc9a-4c11-afe6-6cdfc720a1df
+	fromColumn: fact_sale.fk_channel
+	toColumn: dim_channel.pk_id_channel
+
+relationship AutoDetected_5e415245-9b32-45d7-be32-33cdeeeaf99b
+	fromColumn: fact_return.fk_channel
+	toColumn: dim_channel.pk_id_channel
+
+relationship AutoDetected_45afc13a-60d3-4334-b92b-4f55ce1b115e
+	fromColumn: fact_sale.fk_claim
+	toColumn: dim_claim.pk_id_claim
+
+relationship AutoDetected_9fde8682-22a0-4c63-bd36-3601aff4e50e
+	fromColumn: fact_sale.fk_invoice
+	toColumn: dim_invoice.pk_id_invoice
+
+relationship AutoDetected_7db0f6d0-9bea-4a05-a8e1-849f894a3bc5
+	fromColumn: fact_purchace.fk_invoice
+	toColumn: dim_invoice.pk_id_invoice
+
+relationship AutoDetected_4a213e28-4b36-49b8-897c-7a72914d4a6e
+	fromColumn: fact_return.fk_place
+	toColumn: dim_place.pk_id_place
+
+relationship AutoDetected_05ad2a79-d2bd-44e3-aa85-6a1e6e94af13
+	fromColumn: fact_inventory.fk_product
+	toColumn: dim_product.pk_id_product
+
+relationship AutoDetected_c968c53b-b969-41b1-b6c2-49b4af4ac345
+	fromColumn: fact_sale.fk_product
+	toColumn: dim_product.pk_id_product
+
+relationship AutoDetected_86f0048b-3af0-4811-9931-e987349fda63
+	fromColumn: fact_return.fk_product
+	toColumn: dim_product.pk_id_product
+
+relationship AutoDetected_4d7767b5-1e01-4fd7-8393-5b96de8b6c2b
+	fromColumn: fact_purchace.fk_supplier
+	toColumn: dim_supplier.Pk_id_supplier
+
+relationship AutoDetected_0a1f47ac-5a26-442e-87a8-bc8fd009281e
+	fromColumn: fact_return.fk_order
+	toColumn: dim_order.pk_id_order
+
+relationship 36b3f35d-4ffa-9f96-efb4-077226196320
+	fromColumn: fact_return.fk_client_b2c
+	toColumn: dim_clientb2c.pk_id_client
+
+relationship e94d91f7-01fe-8019-d38a-edc51963392c
+	isActive: false
+	fromColumn: fact_return.fk_client_b2b
+	toColumn: dim_clientb2b.pk_id_client
+
+relationship 08b07b2a-9945-0383-6300-028c0b13ef71
+	fromColumn: dim_delivery.date_livraison
+	toColumn: dim_date.full_date
+
+relationship ed079d3f-04c6-d8ea-0bdf-2b172dadb9a1
+	fromColumn: fact_sale.fk_clientB2C
+	toColumn: dim_clientb2c.pk_id_client
+
+relationship 26ceaebc-0c3f-b997-861c-b0af4ebee318
+	fromColumn: fact_sale.fk_clientB2B
+	toColumn: dim_clientb2b.pk_id_client
+
+relationship f1ca5822-5a44-6de0-4a93-231c383499f6
+	isActive: false
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: dim_order.fk_delivery
+	toColumn: dim_delivery.pk_id_delivery
+
+relationship 5b11cfbd-ee16-0d1f-04d3-2480004901dd
+	isActive: false
+	fromColumn: fact_return.fk_date
+	toColumn: dim_date.full_date
+
+relationship c171f6b8-c136-8667-97c2-b6a25074cbbc
+	fromColumn: fact_sale.fk_place
+	toColumn: dim_place.pk_id_place
+
+relationship 388bd584-e6b9-a1c1-c040-d9c57fa30752
+	isActive: false
+	crossFilteringBehavior: bothDirections
+	toCardinality: many
+	fromColumn: dim_competitor_product.name_prod
+	toColumn: dim_product.name_product
+
+relationship be83be86-4a17-4574-42b0-cc788b92dc40
+	fromColumn: dim_invoice.fk_paiment
+	toColumn: dim_paiment.Pk_id_payment
+
+relationship e72ae97c-9778-f023-fddd-485ae4816a2a
+	crossFilteringBehavior: bothDirections
+	toCardinality: many
+	fromColumn: dim_date.year
+	toColumn: CA.year
+
+relationship 4be80949-a0a9-c03b-a72b-580e79466b7b
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: Security.Role
+	toColumn: PageAccess.Role
+

@@ -1,0 +1,61 @@
+table dim_place
+	lineageTag: 274b73a7-967c-4f0d-98ee-11199d771aae
+
+	column pk_id_place
+		dataType: int64
+		formatString: 0
+		lineageTag: 71b569b5-df7f-4d70-b954-70d693e958ce
+		summarizeBy: none
+		sourceColumn: pk_id_place
+
+		annotation SummarizationSetBy = Automatic
+
+	column adress
+		dataType: string
+		lineageTag: b93e01c3-0379-46f6-af42-0cc068bab14c
+		summarizeBy: none
+		sourceColumn: adress
+
+		annotation SummarizationSetBy = Automatic
+
+	column pstal_code
+		dataType: int64
+		formatString: 0
+		lineageTag: 42da1b82-533b-441e-8842-3be38758488c
+		summarizeBy: sum
+		sourceColumn: pstal_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column city
+		dataType: string
+		lineageTag: acd12807-e345-4f3a-b800-481ed1aaa1cf
+		summarizeBy: none
+		sourceColumn: city
+
+		annotation SummarizationSetBy = Automatic
+
+	column region
+		dataType: string
+		lineageTag: c7cc1a14-0c76-4a01-8ace-33edacebf2db
+		summarizeBy: none
+		sourceColumn: region
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_place = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Databases("hedire\MSSQLSERVER05"),
+				    dw_pi = Source{[Name="dw_pi"]}[Data],
+				    dbo_dim_place = dw_pi{[Schema="dbo",Item="dim_place"]}[Data],
+				    #"Type modifié" = Table.TransformColumnTypes(dbo_dim_place,{{"pstal_code", Int64.Type}}),
+				    #"Erreurs remplacées" = Table.ReplaceErrorValues(#"Type modifié", {{"pstal_code", 1082}})
+				in
+				    #"Erreurs remplacées"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

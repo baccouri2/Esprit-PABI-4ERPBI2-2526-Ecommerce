@@ -1,0 +1,59 @@
+table dim_invoice
+	lineageTag: cd120a7b-8d86-4115-adf9-026e6587c75c
+
+	column pk_id_invoice
+		dataType: int64
+		formatString: 0
+		lineageTag: ded0dd8b-85bd-4323-9313-e9c835b19b4f
+		summarizeBy: none
+		sourceColumn: pk_id_invoice
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_paiment
+		dataType: int64
+		formatString: 0
+		lineageTag: 6caae2c5-eb1a-430c-bcc8-aa8b30fc8de2
+		summarizeBy: none
+		sourceColumn: fk_paiment
+
+		annotation SummarizationSetBy = Automatic
+
+	column num_document
+		dataType: string
+		lineageTag: 1a18b4a2-b9c3-4533-9753-f70dd5e8111b
+		summarizeBy: none
+		sourceColumn: num_document
+
+		annotation SummarizationSetBy = Automatic
+
+	column type_document
+		dataType: string
+		lineageTag: 6f8ac96a-5e34-4233-894b-fe86a1f1f22c
+		summarizeBy: none
+		sourceColumn: type_document
+
+		annotation SummarizationSetBy = Automatic
+
+	column status
+		dataType: string
+		lineageTag: 7f48a2bd-4990-415b-ba80-7f1995c79433
+		summarizeBy: none
+		sourceColumn: status
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_invoice = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Databases("hedire\MSSQLSERVER05"),
+				    dw_pi = Source{[Name="dw_pi"]}[Data],
+				    dbo_dim_invoice = dw_pi{[Schema="dbo",Item="dim_invoice"]}[Data]
+				in
+				    dbo_dim_invoice
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,35 @@
+table dim_material
+	lineageTag: c2567ba5-81d1-4b44-a4af-dcc8635caa25
+
+	column pk_id_material
+		dataType: int64
+		formatString: 0
+		lineageTag: 84a3a1d2-8f4c-4ffd-bd76-86f9abd27214
+		summarizeBy: sum
+		sourceColumn: pk_id_material
+
+		annotation SummarizationSetBy = Automatic
+
+	column nom_material
+		dataType: string
+		lineageTag: b937e472-fab8-4b63-ad07-85f1bb3650ad
+		summarizeBy: none
+		sourceColumn: nom_material
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_material = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Databases("hedire\MSSQLSERVER05"),
+				    dw_pi = Source{[Name="dw_pi"]}[Data],
+				    dbo_dim_material = dw_pi{[Schema="dbo",Item="dim_material"]}[Data],
+				    #"Colonnes permutées" = Table.ReorderColumns(dbo_dim_material,{"pk_id_material", "nom_material"})
+				in
+				    #"Colonnes permutées"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

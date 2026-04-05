@@ -1,0 +1,120 @@
+table fact_inventory
+	lineageTag: b7565f3f-fceb-4652-9af7-dfd8c1f83999
+
+	measure 'Stock Actuel' =
+			
+			SUMX(
+			    'fact_inventory',
+			    VALUE('fact_inventory'[final_stock])
+			)
+		formatString: 0
+		lineageTag: 7f9e25c7-56a0-4385-af70-378537544604
+
+	measure 'Taux Dispo %' =
+			
+			FORMAT(
+			    DIVIDE(
+			        COUNTROWS(FILTER('fact_inventory', VALUE('fact_inventory'[final_stock]) > 0)),
+			        COUNTROWS('fact_inventory'),
+			        0
+			    ),
+			    "0.00%"
+			)
+		lineageTag: f3949b1d-10c4-480d-bbed-9a1eb45f6856
+
+	measure 'Total Livraisons' =
+			
+			COUNT ('dim_delivery'[pk_id_delivery])
+		formatString: 0
+		lineageTag: 23990842-85cf-485d-944f-e96172b27b55
+
+	measure 'Coût Moyen Livraison' =
+			
+			AVERAGE('dim_delivery'[costs])
+		lineageTag: 14b8816c-33a8-4072-9b61-a8f9611a1983
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Average stock' = AVERAGE('fact_inventory'[final_stock])
+		lineageTag: c89b1259-7c1c-47d3-a0ec-fb9ed812d00f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column pk_id_inventory
+		dataType: int64
+		formatString: 0
+		lineageTag: 95023ea6-40af-4fe2-aad4-1fe91bb6dc2a
+		summarizeBy: sum
+		sourceColumn: pk_id_inventory
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_product
+		dataType: int64
+		formatString: 0
+		lineageTag: bc6223db-f3a7-45bf-85d8-9a775f775324
+		summarizeBy: none
+		sourceColumn: fk_product
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_date
+		dataType: int64
+		formatString: 0
+		lineageTag: 1e7e5463-1612-49a5-a1b8-26f03a35e873
+		summarizeBy: none
+		sourceColumn: fk_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column initial_stock
+		dataType: int64
+		formatString: 0
+		lineageTag: 2f496fc9-508d-450e-ade3-3cd8cf44d065
+		summarizeBy: none
+		sourceColumn: initial_stock
+
+		annotation SummarizationSetBy = User
+
+	column stock_in
+		dataType: int64
+		formatString: 0
+		lineageTag: 77d29724-ffe9-464d-bb29-03bf4a607610
+		summarizeBy: none
+		sourceColumn: stock_in
+
+		annotation SummarizationSetBy = User
+
+	column stock_out
+		dataType: int64
+		formatString: 0
+		lineageTag: a8041eaa-8873-415a-8521-c8458a3dec72
+		summarizeBy: none
+		sourceColumn: stock_out
+
+		annotation SummarizationSetBy = User
+
+	column final_stock
+		dataType: int64
+		formatString: 0
+		lineageTag: 7800fb61-54c0-41be-9991-73f12dbebdb3
+		summarizeBy: sum
+		sourceColumn: final_stock
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_inventory = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Databases("hedire\MSSQLSERVER05"),
+				    dw_pi = Source{[Name="dw_pi"]}[Data],
+				    dbo_fact_inventory = dw_pi{[Schema="dbo",Item="fact_inventory"]}[Data],
+				    #"Type modifié" = Table.TransformColumnTypes(dbo_fact_inventory,{{"initial_stock", Int64.Type}, {"stock_in", Int64.Type}, {"stock_out", Int64.Type}, {"final_stock", Int64.Type}})
+				in
+				    #"Type modifié"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

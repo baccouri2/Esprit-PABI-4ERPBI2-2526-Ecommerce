@@ -1,0 +1,7 @@
+role CEO
+	modelPermission: read
+
+	tablePermission Security = [Email] = USERPRINCIPALNAME()
+
+	annotation PBI_Id = 91177bf29c4f4e9188d85481838910eb
+

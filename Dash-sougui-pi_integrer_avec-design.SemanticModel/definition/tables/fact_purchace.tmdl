@@ -1,0 +1,268 @@
+table fact_purchace
+	lineageTag: bc1d46eb-a922-458a-8f42-0898dc7ff7df
+
+	measure %Retenue = DIVIDE([total_retenue], [TTC], 0)
+		lineageTag: bca83781-72fb-4721-b29c-85b3c141fe60
+
+	measure CA_Last_Year =
+			
+			CALCULATE(
+			    [TTC],
+			    SAMEPERIODLASTYEAR('dim_date'[year]))
+		lineageTag: 340bd7dd-3897-450b-b25a-7b5676db07e6
+
+	measure Ecart_TVA = [Total_TVA] - [TVA_Theorique]
+		lineageTag: 51feaad0-5a76-4050-bbd9-8a8c5f59dfba
+
+	measure 'Growth (%)' =
+			
+			DIVIDE(
+			    [TTC] - [CA_Last_Year],
+			    [CA_Last_Year],
+			    0
+			) * 100
+		lineageTag: abf07887-1c95-4e88-8bde-928cc6294418
+
+	measure Mesure = 100
+		formatString: 0
+		lineageTag: 557e1d48-32c9-44b5-93e4-624774f368bc
+
+	measure Nb_Achats = COUNT('fact_purchace'[pk_id_purchase])
+		formatString: 0
+		lineageTag: e51cceca-fb6c-4c92-aad0-b75d43cd0b8f
+
+	measure Nb_Fournisseurs =
+			
+			DISTINCTCOUNT('fact_purchace'[fk_supplier])
+		formatString: 0
+		lineageTag: d248f323-3569-4af7-91c2-c5b4de585860
+
+	measure Ratio_TTC_HT = DIVIDE([TTC], [Total_HT])
+		lineageTag: 967c53ba-06a7-4951-b01a-949f202363e9
+
+	measure 'Top_Fournisseurs (%)' =
+			
+			DIVIDE(
+			    CALCULATE(
+			        [Volume_Achat],
+			        TOPN(5, ALLSELECTED('fact_purchace'), [Volume_Achat])
+			    ),
+			    [Volume_Achat],
+			    0
+			) * 100
+		lineageTag: 67d0e9f9-af5c-4aa7-af07-f6248d1dc29d
+
+	measure total_fodec = sum('fact_purchace'[FODEC])
+		lineageTag: aa2db409-1193-4df9-be63-9e29bc8f5c23
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Total_HT = SUMX('fact_purchace', VALUE('fact_purchace'[amount_excl_tax]))
+		lineageTag: fbfa95ee-24f3-495c-8a29-e31d8d651eca
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure TOTAL_purchase = SUM('fact_purchace'[amount_incl_tax])
+		lineageTag: be023f9a-7e37-4496-ace4-68796f8b47d4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure total_retenue = SUM('fact_purchace'[Retenue])
+		lineageTag: 384d5839-cd18-4ee3-bd3d-310828a482cc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Total_TVA = SUMX('fact_purchace', VALUE('fact_purchace'[TVA]))
+		lineageTag: b6e3ff8b-57a0-4617-8f65-7b0e67f582ad
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure TTC =
+			
+			SUM('fact_purchace'[amount_excl_tax]) +
+			SUM('fact_purchace'[TVA]) +
+			SUM('fact_purchace'[FODEC])
+		lineageTag: 437280a2-684c-4427-8284-8846d195eb82
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure TVA_Theorique = [Total_HT] * 0.19
+		lineageTag: 32fe392c-cd77-4cce-addf-8f004cef9e3e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Volume_Achat =
+			
+			SUM('fact_purchace'[amount_excl_tax])
+		lineageTag: 763e8e9e-1eb1-443f-b2d5-87d2c13e69ca
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Waterfall_Value =
+			
+			SWITCH(
+			    SELECTEDVALUE(Waterfall_Table[Type]),
+			    "Total_HT", [Total_HT],
+			    "Total_TVA", [Total_TVA],
+			    "total_fodec", [total_fodec],
+			    "TTC", [TTC]
+			)
+		lineageTag: a9919894-1f3e-4a30-83bb-b072f1c2a4b6
+
+	measure 'Total Purchase Cost' =
+			
+			SUM(fact_purchace[amount_incl_tax])
+		lineageTag: 0b1b5a7d-dce2-4a85-b5c8-1e3d9fad2d0f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column pk_id_purchase
+		dataType: int64
+		formatString: 0
+		lineageTag: 45c19622-799b-4810-a5c9-6d26bbe81464
+		summarizeBy: none
+		sourceColumn: pk_id_purchase
+
+		annotation SummarizationSetBy = User
+
+	column fk_date
+		dataType: int64
+		formatString: 0
+		lineageTag: a4a3292f-68cf-46cc-a32a-5d8020a018f4
+		summarizeBy: none
+		sourceColumn: fk_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_product
+		dataType: int64
+		formatString: 0
+		lineageTag: e9d43e38-6add-4235-881c-2b63e593ccf2
+		summarizeBy: sum
+		sourceColumn: fk_product
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_supplier
+		dataType: int64
+		formatString: 0
+		lineageTag: 0849a626-012a-4281-8c37-5d279022579a
+		summarizeBy: none
+		sourceColumn: fk_supplier
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_invoice
+		dataType: int64
+		formatString: 0
+		lineageTag: f22378e9-8eba-449a-a7cb-37067259e0c7
+		summarizeBy: none
+		sourceColumn: fk_invoice
+
+		annotation SummarizationSetBy = Automatic
+
+	column amount_excl_tax
+		dataType: double
+		lineageTag: 70cfc28e-8b26-4e79-9e4e-1c1fd345530b
+		summarizeBy: sum
+		sourceColumn: amount_excl_tax
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column TVA
+		dataType: double
+		lineageTag: 64000868-8902-48cd-b5e3-5c00eea6677e
+		summarizeBy: sum
+		sourceColumn: TVA
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column amount_incl_tax
+		dataType: double
+		lineageTag: 70f0a6d7-ff0a-48f2-a297-a88bdcf513be
+		summarizeBy: sum
+		sourceColumn: amount_incl_tax
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column remaining_amount
+		dataType: double
+		lineageTag: db0ac2b9-468e-4fdb-95df-1f670981f618
+		summarizeBy: sum
+		sourceColumn: remaining_amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column total_payments_made
+		dataType: double
+		lineageTag: 20ceac1a-dda0-4101-a6a4-a4a3bc1cc16f
+		summarizeBy: sum
+		sourceColumn: total_payments_made
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Retenue
+		dataType: double
+		lineageTag: 331df513-3318-495b-8779-88ab4d7f09f8
+		summarizeBy: sum
+		sourceColumn: Retenue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Taux_TVA
+		dataType: double
+		lineageTag: 0304d5a0-b0a2-4bd6-a4b5-117a23a5f472
+		summarizeBy: sum
+		sourceColumn: Taux_TVA
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column FODEC
+		dataType: double
+		lineageTag: 8bf6725a-ee9a-4649-981a-4322cadb990e
+		summarizeBy: sum
+		sourceColumn: FODEC
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition fact_purchace = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Databases("hedire\MSSQLSERVER05"),
+				    dw_pi = Source{[Name="dw_pi"]}[Data],
+				    dbo_fact_purchace = dw_pi{[Schema="dbo",Item="fact_purchace"]}[Data],
+				    #"Type modifié" = Table.TransformColumnTypes(dbo_fact_purchace,{{"amount_excl_tax", type number}}),
+				    #"Valeur remplacée" = Table.ReplaceValue(#"Type modifié",".",",",Replacer.ReplaceText,{"TVA"}),
+				    #"Type modifié1" = Table.TransformColumnTypes(#"Valeur remplacée",{{"TVA", type number}}),
+				    #"Valeur remplacée1" = Table.ReplaceValue(#"Type modifié1",".",",",Replacer.ReplaceText,{"amount_incl_tax"}),
+				    #"Type modifié2" = Table.TransformColumnTypes(#"Valeur remplacée1",{{"amount_incl_tax", type number}}),
+				    #"Valeur remplacée2" = Table.ReplaceValue(#"Type modifié2",".",",",Replacer.ReplaceText,{"remaining_amount"}),
+				    #"Type modifié3" = Table.TransformColumnTypes(#"Valeur remplacée2",{{"remaining_amount", type number}, {"total_payments_made", type number}}),
+				    #"Valeur remplacée3" = Table.ReplaceValue(#"Type modifié3",".",",",Replacer.ReplaceText,{"Retenue"}),
+				    #"Type modifié4" = Table.TransformColumnTypes(#"Valeur remplacée3",{{"Retenue", type number}, {"Taux_TVA", type number}}),
+				    #"Valeur remplacée4" = Table.ReplaceValue(#"Type modifié4",".",",",Replacer.ReplaceText,{"FODEC"}),
+				    #"Type modifié5" = Table.TransformColumnTypes(#"Valeur remplacée4",{{"FODEC", type number}})
+				in
+				    #"Type modifié5"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

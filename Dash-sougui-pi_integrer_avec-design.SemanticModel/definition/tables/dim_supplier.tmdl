@@ -1,0 +1,50 @@
+table dim_supplier
+	lineageTag: d3d0d830-06d9-411f-aadf-620398208191
+
+	column Pk_id_supplier
+		dataType: int64
+		formatString: 0
+		lineageTag: 83ed6f09-d16f-4092-bb1f-ab1a66337b9f
+		summarizeBy: none
+		sourceColumn: Pk_id_supplier
+
+		annotation SummarizationSetBy = Automatic
+
+	column name_supplier
+		dataType: string
+		lineageTag: 3cb57e46-0968-4693-8dc5-65b9053cea97
+		summarizeBy: none
+		sourceColumn: name_supplier
+
+		annotation SummarizationSetBy = Automatic
+
+	column company
+		dataType: string
+		lineageTag: 9ba13033-f7f5-4b83-b911-31889c54078e
+		summarizeBy: none
+		sourceColumn: company
+
+		annotation SummarizationSetBy = Automatic
+
+	column Payment_Method
+		dataType: string
+		lineageTag: 47d05e87-033e-45de-ba70-bd42d9adb751
+		summarizeBy: none
+		sourceColumn: Payment_Method
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_supplier = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Databases("hedire\MSSQLSERVER05"),
+				    dw_pi = Source{[Name="dw_pi"]}[Data],
+				    dbo_dim_supplier = dw_pi{[Schema="dbo",Item="dim_supplier"]}[Data]
+				in
+				    dbo_dim_supplier
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

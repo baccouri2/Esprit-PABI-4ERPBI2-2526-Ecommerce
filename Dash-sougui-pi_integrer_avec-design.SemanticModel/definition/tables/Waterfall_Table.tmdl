@@ -1,0 +1,28 @@
+table Waterfall_Table
+	lineageTag: 3f12181e-c520-4495-b12e-7e3a103d00bd
+
+	column Type
+		lineageTag: 3dc6daac-1555-408a-ac15-8cd69f387617
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Type]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Waterfall_Table = calculated
+		mode: import
+		source = ```
+				
+				DATATABLE(
+				    "Type", STRING,
+				    {   {"TTC"},
+				        {"Total_HT"},
+				        {"Total_TVA"},
+				        {"total_fodec"}
+				        
+				    }
+				)
+				```
+
+	annotation PBI_Id = e2443aa504714cf2a80ef81b70b17b4f
+

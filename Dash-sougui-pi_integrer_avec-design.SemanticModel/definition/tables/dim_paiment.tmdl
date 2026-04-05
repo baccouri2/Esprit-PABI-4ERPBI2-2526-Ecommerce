@@ -1,0 +1,60 @@
+table dim_paiment
+	lineageTag: 718f2ede-baf8-4d3e-b13d-39d3a714826c
+
+	column Pk_id_payment
+		dataType: int64
+		formatString: 0
+		lineageTag: cfc7cd24-2e87-4f96-aaa6-68e4ac47843b
+		summarizeBy: none
+		sourceColumn: Pk_id_payment
+
+		annotation SummarizationSetBy = Automatic
+
+	column payment_id
+		dataType: string
+		lineageTag: b79539bc-0c85-475e-87e3-43be07c2aa8c
+		summarizeBy: none
+		sourceColumn: payment_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column payment_method
+		dataType: string
+		lineageTag: d30a8477-d1c3-43fd-b58a-e661f15757f6
+		summarizeBy: none
+		sourceColumn: payment_method
+
+		annotation SummarizationSetBy = Automatic
+
+	column payment_status
+		dataType: string
+		lineageTag: 13bbf8a5-c36e-4255-9fb5-08e18ff1671c
+		summarizeBy: none
+		sourceColumn: payment_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column type_document
+		dataType: string
+		lineageTag: 5835a532-0425-4ebf-a8c8-d42fbb716a25
+		summarizeBy: none
+		sourceColumn: type_document
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_paiment = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Databases("hedire\MSSQLSERVER05"),
+				    dw_pi = Source{[Name="dw_pi"]}[Data],
+				    dbo_dim_paiment = dw_pi{[Schema="dbo",Item="dim_paiment"]}[Data],
+				    #"Valeur remplacée" = Table.ReplaceValue(dbo_dim_paiment,"-   ","not defined",Replacer.ReplaceText,{"payment_id"}),
+				    #"Erreurs supprimées" = Table.RemoveRowsWithErrors(#"Valeur remplacée", {"payment_id"})
+				in
+				    #"Erreurs supprimées"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

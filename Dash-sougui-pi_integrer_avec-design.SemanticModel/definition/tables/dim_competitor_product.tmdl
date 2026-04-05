@@ -1,0 +1,58 @@
+table dim_competitor_product
+	lineageTag: cff308f8-b13f-449a-b6d1-27901166ba02
+
+	column pk_id_prod_comp
+		dataType: int64
+		formatString: 0
+		lineageTag: ee2e64b8-e7cc-4e7b-9f23-5a96664a86e6
+		summarizeBy: sum
+		sourceColumn: pk_id_prod_comp
+
+		annotation SummarizationSetBy = Automatic
+
+	column id_prod_comp
+		dataType: string
+		lineageTag: bb88425e-f19d-46ef-a68a-b48d61819fea
+		summarizeBy: none
+		sourceColumn: id_prod_comp
+
+		annotation SummarizationSetBy = Automatic
+
+	column name_prod
+		dataType: string
+		lineageTag: 5920c928-6c3f-49fd-b4e5-5fca1cbe9a79
+		summarizeBy: none
+		sourceColumn: name_prod
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: 20fd12fb-fc26-4754-824e-a7bed00b1410
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column competitor_name
+		dataType: string
+		lineageTag: f5fd1ea8-8cac-43da-9f66-e23a32779177
+		summarizeBy: none
+		sourceColumn: competitor_name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_competitor_product = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Databases("hedire\MSSQLSERVER05"),
+				    dw_pi = Source{[Name="dw_pi"]}[Data],
+				    dbo_dim_competitor_product = dw_pi{[Schema="dbo",Item="dim_competitor_product"]}[Data]
+				in
+				    dbo_dim_competitor_product
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

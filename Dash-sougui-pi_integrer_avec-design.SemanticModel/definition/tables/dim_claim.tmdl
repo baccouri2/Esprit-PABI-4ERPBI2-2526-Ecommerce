@@ -1,0 +1,46 @@
+table dim_claim
+	lineageTag: aee64362-805f-4917-b318-6dbb609254ae
+
+	measure 'claim number' = COUNTROWS(dim_claim)
+		formatString: 0
+		lineageTag: c9acbcbe-37ee-439c-9954-cf4dbb9b1373
+
+	column pk_id_claim
+		dataType: int64
+		formatString: 0
+		lineageTag: 9b01560d-45f3-44c0-bdbb-0afb55b17ffe
+		summarizeBy: none
+		sourceColumn: pk_id_claim
+
+		annotation SummarizationSetBy = Automatic
+
+	column description
+		dataType: string
+		lineageTag: 420b1a88-c358-4d95-a97e-13ad1ec35076
+		summarizeBy: none
+		sourceColumn: description
+
+		annotation SummarizationSetBy = Automatic
+
+	column status
+		dataType: string
+		lineageTag: 01ea2616-5e89-4401-9411-0430c4cf8bb5
+		summarizeBy: none
+		sourceColumn: status
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_claim = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Databases("hedire\MSSQLSERVER05"),
+				    dw_pi = Source{[Name="dw_pi"]}[Data],
+				    dbo_dim_claim = dw_pi{[Schema="dbo",Item="dim_claim"]}[Data]
+				in
+				    dbo_dim_claim
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

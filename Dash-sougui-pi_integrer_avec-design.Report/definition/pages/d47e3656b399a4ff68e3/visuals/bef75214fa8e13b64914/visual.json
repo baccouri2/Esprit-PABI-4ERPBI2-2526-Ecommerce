@@ -1,0 +1,66 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "bef75214fa8e13b64914",
+  "position": {
+    "x": 822.16894340674662,
+    "y": 423.17519145935489,
+    "z": 12000,
+    "height": 263.30900801915413,
+    "width": 436.60932452155663,
+    "tabOrder": 12000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_supplier"
+                    }
+                  },
+                  "Property": "name_supplier"
+                }
+              },
+              "queryRef": "dim_supplier.name_supplier",
+              "nativeQueryRef": "name_supplier"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_purchace"
+                    }
+                  },
+                  "Property": "total_retenue"
+                }
+              },
+              "queryRef": "fact_purchace.total_retenue",
+              "nativeQueryRef": "total_retenue"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_paiment"
+                    }
+                  },
+                  "Property": "payment_method"
+                }
+              },
+              "queryRef": "dim_paiment.payment_method",
+              "nativeQueryRef": "payment_method"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

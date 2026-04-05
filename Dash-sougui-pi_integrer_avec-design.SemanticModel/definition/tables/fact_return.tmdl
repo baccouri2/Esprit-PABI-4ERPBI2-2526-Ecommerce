@@ -1,0 +1,245 @@
+table fact_return
+	lineageTag: 584a4eda-4663-4591-8fec-abf3ccf84a77
+
+	measure Return_Rate = ```
+			
+			VAR NombreReturns = 
+			    CALCULATE(
+			        COUNTROWS(fact_return)
+			    )
+			    
+			VAR NombreSales = 
+			    CALCULATE(
+			        COUNTROWS(fact_sale)
+			    )
+			    
+			RETURN
+			    DIVIDE(NombreSales ,NombreReturns, 0)
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 8cb71485-8759-485b-bcaa-03ce501dc7c3
+
+	measure 'Nb Channel' =
+			
+			COUNT( 'fact_return'[fk_channel] )
+		formatString: 0
+		lineageTag: cd5e2c11-84ce-4aeb-a0da-0d29e0e7462b
+
+	measure 'Nb Commandes distinctes' =
+			
+			COUNT( 'fact_return'[fk_order] )
+		formatString: 0
+		lineageTag: 1675d884-76dd-49e5-905c-2106b30d7823
+
+	measure 'NB Orders' = COUNT('fact_return'[fk_order])
+		formatString: 0
+		lineageTag: 571825c5-0e27-445c-b52d-83487a337920
+
+	measure 'Nb Orders par Zone' =
+			
+			COUNTROWS('dim_order')
+		formatString: 0
+		lineageTag: ac0d17fb-6625-4e4f-9c22-ffbb033fcfaa
+
+	measure 'Nb Retours' =
+			
+			COUNTROWS('fact_return')
+		formatString: 0
+		lineageTag: db329d53-d21e-4e56-8166-6d33c338006d
+
+	measure 'Orders Completed' =
+			
+			DIVIDE(
+			    CALCULATE(COUNT('dim_order'[pk_id_order]), 'dim_order'[order_status] = "Terminée"),
+			    COUNT('dim_order'[id_order])
+			)
+		lineageTag: 6de06b8b-ec7f-478a-9567-5291147240c3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Mesure 2'
+		lineageTag: 2b2ee437-8634-480b-9de3-a036b145eaf6
+
+		annotation 43dbc3e8-3a1c-4b6f-9923-b49ff7d6691c = True
+
+	measure Return_Rate_Color =
+			
+			VAR rr = [Return_Rate]
+			
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    rr < 5, "#2ECC71",        -- vert
+			    rr < 10, "#F1C40F",       -- jaune
+			    rr < 20, "#E67E22",       -- orange
+			    "#E74C3C"                 -- rouge
+			)
+		lineageTag: 0be23404-bfdd-44a4-bf52-210eaabc3a42
+
+	measure Return_Target = 10
+		formatString: 0
+		lineageTag: 0d840796-4193-4768-8ce1-6a353ac4b0b7
+
+	measure 'Returned Orders' =
+			
+			DISTINCTCOUNT('fact_return'[Return Keyy])
+		lineageTag: f846be7c-818b-40bc-980a-3d4e45f8c2aa
+
+	measure 'Taux_Retour (%)' =
+			
+			DIVIDE(
+			    SUM('fact_return'[returned_quantity]),
+			    CALCULATE(
+			        SUM('fact_sale'[quantity]),
+			        USERELATIONSHIP('fact_sale'[fk_date], 'dim_date'[pk_id_date])
+			    ),
+			    0
+			)*100
+		lineageTag: 09c090c0-5e49-4685-a5d2-c8c6c81f0cc4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Taux_Retour_Produit (%)' =
+			
+			DIVIDE(
+			    SUM('fact_return'[returned_quantity]),
+			    CALCULATE(SUM('fact_sale'[quantity]), ALLEXCEPT('fact_sale', 'fact_sale'[fk_product])),
+			    0
+			) * 100
+		lineageTag: 4419a38d-ad8a-4033-907d-e93160754a70
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Orders' =
+			
+			DISTINCTCOUNT('fact_sale'[fk_order])
+		formatString: 0
+		lineageTag: 8c66a3d7-7286-4303-909b-2b82b0abaa59
+
+	column pk_id_return
+		dataType: int64
+		formatString: 0
+		lineageTag: b0b91484-cb47-48f9-8be8-92d3d4c45fce
+		summarizeBy: sum
+		sourceColumn: pk_id_return
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_date
+		dataType: int64
+		formatString: 0
+		lineageTag: 1b2b42ea-c842-4435-907b-ffba785c68af
+		summarizeBy: none
+		sourceColumn: fk_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_product
+		dataType: int64
+		formatString: 0
+		lineageTag: eace8dee-36eb-4c9b-a47a-e9bbaecc5f9d
+		summarizeBy: none
+		sourceColumn: fk_product
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_order
+		dataType: int64
+		formatString: 0
+		lineageTag: aeed8748-aaaa-4b26-a631-1553834642c6
+		summarizeBy: none
+		sourceColumn: fk_order
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_channel
+		dataType: int64
+		formatString: 0
+		lineageTag: 5c8b207c-9953-4e18-937b-c0b6515ee815
+		summarizeBy: none
+		sourceColumn: fk_channel
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_place
+		dataType: int64
+		formatString: 0
+		lineageTag: 5c2c7961-64b5-4572-83bc-fe6cb5314cd3
+		summarizeBy: none
+		sourceColumn: fk_place
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_invoice
+		dataType: int64
+		formatString: 0
+		lineageTag: 37fb8695-de8a-4307-b581-0aa5c75f081e
+		summarizeBy: sum
+		sourceColumn: fk_invoice
+
+		annotation SummarizationSetBy = Automatic
+
+	column returned_quantity
+		dataType: double
+		lineageTag: 12209d89-b533-4bf9-b7f4-d96c146dbfc8
+		summarizeBy: sum
+		sourceColumn: returned_quantity
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column refund_amount
+		dataType: double
+		lineageTag: 4ee066b5-1cf9-430c-9698-25b03bf3d91e
+		summarizeBy: sum
+		sourceColumn: refund_amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column fk_client_b2c
+		dataType: int64
+		formatString: 0
+		lineageTag: e33f3791-1328-4f0a-b412-36f1dc458734
+		summarizeBy: none
+		sourceColumn: fk_client_b2c
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_client_b2b
+		dataType: int64
+		formatString: 0
+		lineageTag: d86d61af-ccce-49f1-bb85-8ee078026243
+		summarizeBy: sum
+		sourceColumn: fk_client_b2b
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Return Keyy' =
+			
+			'fact_return'[fk_order] & "-" & 'fact_return'[fk_product]
+		lineageTag: 8c294046-8782-460c-98cf-40e4a1e5f155
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_return = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Databases("hedire\MSSQLSERVER05"),
+				    dw_pi = Source{[Name="dw_pi"]}[Data],
+				    dbo_fact_return = dw_pi{[Schema="dbo",Item="fact_return"]}[Data],
+				    #"Type modifié" = Table.TransformColumnTypes(dbo_fact_return,{{"returned_quantity", type number}}),
+				    #"Valeur remplacée" = Table.ReplaceValue(#"Type modifié",".",",",Replacer.ReplaceText,{"refund_amount"}),
+				    #"Type modifié1" = Table.TransformColumnTypes(#"Valeur remplacée",{{"refund_amount", type number}}),
+				    #"Colonnes supprimées" = Table.RemoveColumns(#"Type modifié1",{"id_return"})
+				in
+				    #"Colonnes supprimées"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,59 @@
+table dim_delivery
+	lineageTag: a96afbeb-c272-4cd1-ba2d-a1e2d4184214
+
+	column pk_id_delivery
+		dataType: int64
+		formatString: 0
+		lineageTag: 4e4edf4f-6853-446c-a142-cad4886b89cd
+		summarizeBy: sum
+		sourceColumn: pk_id_delivery
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_livraison
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 63cd16c7-340a-44ab-a4e6-a6ffc704434f
+		summarizeBy: none
+		sourceColumn: date_livraison
+
+		annotation SummarizationSetBy = Automatic
+
+	column costs
+		dataType: double
+		lineageTag: a263d3f5-c350-4ecb-9377-0a701f6c1694
+		summarizeBy: sum
+		sourceColumn: costs
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column company
+		dataType: string
+		lineageTag: ec273040-1685-47b4-af0e-c967d4dbe2d3
+		summarizeBy: none
+		sourceColumn: company
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_delivery = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Databases("hedire\MSSQLSERVER05"),
+				    dw_pi = Source{[Name="dw_pi"]}[Data],
+				    dbo_dim_delivery = dw_pi{[Schema="dbo",Item="dim_delivery"]}[Data],
+				    #"Type modifié" = Table.TransformColumnTypes(dbo_dim_delivery,{{"num_bl", type datetime}, {"costs", type number}}),
+				    #"Fractionner la colonne par délimiteur" = Table.SplitColumn(Table.TransformColumnTypes(#"Type modifié", {{"num_bl", type text}}, "fr-FR"), "num_bl", Splitter.SplitTextByDelimiter(" ", QuoteStyle.Csv), {"num_bl.1", "num_bl.2"}),
+				    #"Type modifié1" = Table.TransformColumnTypes(#"Fractionner la colonne par délimiteur",{{"num_bl.1", type date}, {"num_bl.2", type time}}),
+				    #"Colonnes supprimées" = Table.RemoveColumns(#"Type modifié1",{"num_bl.2"}),
+				    #"Type modifié2" = Table.TransformColumnTypes(#"Colonnes supprimées",{{"num_bl.1", type datetime}}),
+				    #"Colonnes renommées" = Table.RenameColumns(#"Type modifié2",{{"num_bl.1", "date_livraison"}})
+				in
+				    #"Colonnes renommées"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,7 @@
+role sales_manager
+	modelPermission: read
+
+	tablePermission Security = [Email] = USERPRINCIPALNAME()
+
+	annotation PBI_Id = ac60f2962a9b4b3aa99186a13fa4466c
+
