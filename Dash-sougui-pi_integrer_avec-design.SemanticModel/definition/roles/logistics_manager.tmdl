@@ -1,0 +1,7 @@
+role logistics_manager
+	modelPermission: read
+
+	tablePermission Security = [Email] = USERPRINCIPALNAME()
+
+	annotation PBI_Id = c7e86fefbe8d4075aaeb9a0fbc82b597
+

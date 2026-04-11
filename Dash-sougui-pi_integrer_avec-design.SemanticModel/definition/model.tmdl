@@ -1,0 +1,52 @@
+model Model
+	culture: fr-FR
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: fr-FR
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+/// Erreurs dans les requêtes qui ont été chargées sur 27/03/2026 13:23:24.
+queryGroup 'Erreurs des requêtes – 27/03/2026 13:23:24'
+
+	annotation PBI_QueryGroupOrder = 0
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["dim_date","dim_category","dim_channel","dim_claim","dim_clientb2b","dim_clientb2c","dim_competitor_product","dim_delivery","dim_invoice","dim_material","dim_paiment","dim_place","dim_product","dim_supplier","fact_inventory","fact_sale","fact_purchace","dim_order","fact_return","CA"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table dim_date
+ref table DateTableTemplate_806299dc-b953-4e33-bd2b-345336d5cf26
+ref table LocalDateTable_9cbb6752-fb1f-4920-b39f-b44a2aafbb2c
+ref table dim_category
+ref table dim_channel
+ref table dim_claim
+ref table dim_clientb2b
+ref table dim_clientb2c
+ref table dim_competitor_product
+ref table dim_delivery
+ref table dim_invoice
+ref table dim_material
+ref table dim_paiment
+ref table dim_place
+ref table dim_product
+ref table dim_supplier
+ref table fact_inventory
+ref table fact_sale
+ref table fact_purchace
+ref table dim_order
+ref table LocalDateTable_07e92495-d310-40c4-8ee7-1806d20c4e1a
+ref table fact_return
+ref table CA
+ref table Waterfall_Table
+ref table Security
+ref table PageAccess
+
+ref role CEO
+ref role logistics_manager
+ref role sales_manager
+
+ref cultureInfo fr-FR
+

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "69b3993607bcb35fcea8",
+  "position": {
+    "x": 400.55503064006695,
+    "y": 478.92449315660178,
+    "z": 1000,
+    "height": 145.54328753070754,
+    "width": 723.98455848608376,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_product"
+                    }
+                  },
+                  "Property": "Statut Tx produits eco"
+                }
+              },
+              "queryRef": "dim_product.Statut Tx produits eco",
+              "nativeQueryRef": "Statut Tx produits eco"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

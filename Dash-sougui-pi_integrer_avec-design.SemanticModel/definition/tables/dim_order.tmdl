@@ -1,0 +1,70 @@
+table dim_order
+	lineageTag: c7a0df04-a531-4dbb-aae1-ef1e69dbb9c9
+
+	column pk_id_order
+		dataType: int64
+		formatString: 0
+		lineageTag: 90390f19-bf6b-467e-8fa0-d47960a13621
+		summarizeBy: none
+		sourceColumn: pk_id_order
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_delivery
+		dataType: int64
+		formatString: 0
+		lineageTag: 251348ff-9a47-4312-8eb6-6915325e5ca4
+		summarizeBy: sum
+		sourceColumn: fk_delivery
+
+		annotation SummarizationSetBy = Automatic
+
+	column id_order
+		dataType: string
+		lineageTag: c83459b7-d8cd-48ad-b860-7e1a39cb3e20
+		summarizeBy: none
+		sourceColumn: id_order
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_status
+		dataType: string
+		lineageTag: 7fc1efa0-f30d-4691-9a05-df2392d54704
+		summarizeBy: none
+		sourceColumn: order_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_commande
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: fb511827-0c0f-4216-a37a-5caca4547346
+		summarizeBy: none
+		sourceColumn: date_commande
+
+		variation Variation
+			isDefault
+			relationship: d0a3d2fe-0caf-4ddf-b517-a71620c33cbc
+			defaultHierarchy: LocalDateTable_07e92495-d310-40c4-8ee7-1806d20c4e1a.'Hiérarchie de dates'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_order = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Databases("hedire\MSSQLSERVER05"),
+				    dw_pi = Source{[Name="dw_pi"]}[Data],
+				    dbo_dim_order = dw_pi{[Schema="dbo",Item="dim_order"]}[Data],
+				    #"Fractionner la colonne par délimiteur" = Table.SplitColumn(dbo_dim_order, "date_commande", Splitter.SplitTextByDelimiter(" ", QuoteStyle.Csv), {"date_commande.1", "date_commande.2"}),
+				    #"Type modifié" = Table.TransformColumnTypes(#"Fractionner la colonne par délimiteur",{{"date_commande.1", type date}, {"date_commande.2", type time}}),
+				    #"Colonnes supprimées" = Table.RemoveColumns(#"Type modifié",{"date_commande.2"}),
+				    #"Colonnes renommées" = Table.RenameColumns(#"Colonnes supprimées",{{"date_commande.1", "date_commande"}}),
+				    #"Type modifié1" = Table.TransformColumnTypes(#"Colonnes renommées",{{"date_commande", type datetime}})
+				in
+				    #"Type modifié1"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,35 @@
+table PageAccess
+	lineageTag: 9f858ddf-6e8a-4ff4-b594-bfb72905e073
+
+	column PageName
+		lineageTag: 244fd3cd-85e5-4a3c-a7e6-6bd54d9e8a8a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [PageName]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Role
+		lineageTag: 915145af-8ca1-4efb-9b37-e060aa695aaf
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Role]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition PageAccess = calculated
+		mode: import
+		source =
+				
+				DATATABLE(
+				    "PageName", STRING,
+				    "Role", STRING,
+				    {
+				        { "CEO", "CEO" },
+				        { "Sales manager", "sales_manager" },
+				        { "Logistics Manager", "logistics_manager" }
+				    }
+				)
+
+	annotation PBI_Id = 236ba4135d4444b5939983091aefab50
+

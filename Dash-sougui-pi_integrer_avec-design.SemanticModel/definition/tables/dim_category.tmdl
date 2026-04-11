@@ -1,0 +1,42 @@
+table dim_category
+	lineageTag: 310a2240-63cb-47e5-93fe-52c3ea2d9440
+
+	column pk_id_category
+		dataType: int64
+		formatString: 0
+		lineageTag: 705f0ce4-619b-4ed8-af4e-26b925d90626
+		summarizeBy: none
+		sourceColumn: pk_id_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column name_category
+		dataType: string
+		lineageTag: 606ab6c8-f941-4321-918f-51c390475061
+		summarizeBy: none
+		sourceColumn: name_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column number_product
+		dataType: string
+		lineageTag: b015cef5-71c0-404f-a35d-2301e4b2df77
+		summarizeBy: none
+		sourceColumn: number_product
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_category = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Databases("hedire\MSSQLSERVER05"),
+				    dw_pi = Source{[Name="dw_pi"]}[Data],
+				    dbo_dim_category = dw_pi{[Schema="dbo",Item="dim_category"]}[Data]
+				in
+				    dbo_dim_category
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

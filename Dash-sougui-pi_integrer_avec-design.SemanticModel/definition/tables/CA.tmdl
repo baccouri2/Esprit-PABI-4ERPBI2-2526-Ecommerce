@@ -1,0 +1,59 @@
+table CA
+	lineageTag: f9159cf3-0b8f-4712-9b0e-cd9581ccbac5
+
+	column Mois
+		dataType: string
+		lineageTag: d1eb3702-bc7b-46c3-a643-61abf08daec3
+		summarizeBy: none
+		sourceColumn: Mois
+
+		annotation SummarizationSetBy = Automatic
+
+	column CA
+		dataType: double
+		formatString: #,0.00\ "DT";-#,0.00\ "DT";#,0.00\ "DT"
+		lineageTag: 01c47ba1-c9c7-4975-b833-9e613b1aacb3
+		summarizeBy: sum
+		sourceColumn: CA
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"fr-TN"}
+
+	column Pourcentage
+		dataType: double
+		lineageTag: 67fd8417-b856-44cc-8fa5-4a4862c1681b
+		summarizeBy: sum
+		sourceColumn: Pourcentage
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: 872a34e8-69c5-4043-943f-971210f93b75
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = User
+
+	partition CA = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\hedir\OneDrive\Desktop\E-commerce\E-commerce\artisanat\Bilan B2B\CA par mois.xlsx"), null, true),
+				    CA_Sheet = Source{[Item="CA",Kind="Sheet"]}[Data],
+				    #"En-têtes promus" = Table.PromoteHeaders(CA_Sheet, [PromoteAllScalars=true]),
+				    #"Type modifié" = Table.TransformColumnTypes(#"En-têtes promus",{{"Mois", type text}, {"CA", type number}, {"Pourcentage", type any}, {"year", Int64.Type}}),
+				    #"Erreurs remplacées" = Table.ReplaceErrorValues(#"Type modifié", {{"CA", 0}}),
+				    #"Type modifié1" = Table.TransformColumnTypes(#"Erreurs remplacées",{{"Pourcentage", type number}}),
+				    #"Erreurs remplacées1" = Table.ReplaceErrorValues(#"Type modifié1", {{"Pourcentage", 0}})
+				in
+				    #"Erreurs remplacées1"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

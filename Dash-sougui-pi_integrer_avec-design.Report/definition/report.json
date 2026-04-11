@@ -1,0 +1,154 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.2.0/schema.json",
+  "themeCollection": {
+    "baseTheme": {
+      "name": "CY26SU02",
+      "reportVersionAtImport": {
+        "visual": "2.6.0",
+        "report": "3.1.0",
+        "page": "2.3.0"
+      },
+      "type": "SharedResources"
+    }
+  },
+  "objects": {
+    "section": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Top'"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "resourcePackages": [
+    {
+      "name": "SharedResources",
+      "type": "SharedResources",
+      "items": [
+        {
+          "name": "CY26SU02",
+          "path": "BaseThemes/CY26SU02.json",
+          "type": "BaseTheme"
+        }
+      ]
+    },
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "brain4984495182021472.jpg",
+          "path": "brain4984495182021472.jpg",
+          "type": "Image"
+        },
+        {
+          "name": "Capture_d'_cran_2026-04-01_1243549520023097543.png",
+          "path": "Capture_d'_cran_2026-04-01_1243549520023097543.png",
+          "type": "Image"
+        },
+        {
+          "name": "Capture_d'_cran_2026-04-01_1247012505957336456.png",
+          "path": "Capture_d'_cran_2026-04-01_1247012505957336456.png",
+          "type": "Image"
+        },
+        {
+          "name": "Capture_d'_cran_2026-04-01_1247573138893795949.png",
+          "path": "Capture_d'_cran_2026-04-01_1247573138893795949.png",
+          "type": "Image"
+        },
+        {
+          "name": "Capture_d'_cran_2026-04-01_1247813866620506859.png",
+          "path": "Capture_d'_cran_2026-04-01_1247813866620506859.png",
+          "type": "Image"
+        },
+        {
+          "name": "Capture_d'_cran_2026-04-01_1249023470655427995.png",
+          "path": "Capture_d'_cran_2026-04-01_1249023470655427995.png",
+          "type": "Image"
+        },
+        {
+          "name": "Capture_d'_cran_2026-04-01_12522314336506784904.png",
+          "path": "Capture_d'_cran_2026-04-01_12522314336506784904.png",
+          "type": "Image"
+        },
+        {
+          "name": "Capture_d'_cran_2026-04-01_12524710816386288115.png",
+          "path": "Capture_d'_cran_2026-04-01_12524710816386288115.png",
+          "type": "Image"
+        },
+        {
+          "name": "Capture_d'_cran_2026-04-01_12542971734228261005.png",
+          "path": "Capture_d'_cran_2026-04-01_12542971734228261005.png",
+          "type": "Image"
+        },
+        {
+          "name": "Capture_d'_cran_2026-04-02_14108675665559020496.png",
+          "path": "Capture_d'_cran_2026-04-02_14108675665559020496.png",
+          "type": "Image"
+        },
+        {
+          "name": "Capture_d'_cran_2026-04-04_11239867817346546763.png",
+          "path": "Capture_d'_cran_2026-04-04_11239867817346546763.png",
+          "type": "Image"
+        },
+        {
+          "name": "Capture_d'_cran_2026-04-04_1126086117327853234.png",
+          "path": "Capture_d'_cran_2026-04-04_1126086117327853234.png",
+          "type": "Image"
+        },
+        {
+          "name": "Capture_d'_cran_2026-04-05_0025303744297202377.png",
+          "path": "Capture_d'_cran_2026-04-05_0025303744297202377.png",
+          "type": "Image"
+        },
+        {
+          "name": "ceo-icon-vector-removebg-previ5551557819591328.png",
+          "path": "ceo-icon-vector-removebg-previ5551557819591328.png",
+          "type": "Image"
+        },
+        {
+          "name": "OIP-removebg-preview2663866608731843.png",
+          "path": "OIP-removebg-preview2663866608731843.png",
+          "type": "Image"
+        },
+        {
+          "name": "R-removebg-preview07666013163798335.png",
+          "path": "R-removebg-preview07666013163798335.png",
+          "type": "Image"
+        },
+        {
+          "name": "sougui_logo789322200759446.png",
+          "path": "sougui_logo789322200759446.png",
+          "type": "Image"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "useStylableVisualContainerHeader": true,
+    "exportDataMode": "AllowSummarized",
+    "defaultDrillFilterOtherVisuals": true,
+    "allowChangeFilterTypes": true,
+    "useEnhancedTooltips": true,
+    "useDefaultAggregateDisplayName": true
+  }
+}

@@ -1,0 +1,13 @@
+# Dossier cache Power BI - à ne JAMAIS commit
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+**/.pbi/*.lock
+
+# Fichiers temporaires
+*.tmp
+*.bak
+*.log
+
+# Fichiers système
+.DS_Store
+Thumbs.db

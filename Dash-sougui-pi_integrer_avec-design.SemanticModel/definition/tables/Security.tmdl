@@ -1,0 +1,35 @@
+table Security
+	lineageTag: 0458918e-bbf5-4c87-9736-660d34a3b5e9
+
+	column Email
+		lineageTag: 6149644c-18b5-45f9-8496-eac035e477bc
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Email]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Role
+		lineageTag: 2ab6b063-e932-4d43-8077-40ca974b8dd9
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Role]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Security = calculated
+		mode: import
+		source =
+				
+				DATATABLE(
+				    "Email", STRING,
+				    "Role", STRING,
+				    {
+				        { "ceo@sougui.com", "CEO" },
+				        { "sales@sougui.com", "sales_manager" },
+				        { "logistics@sougui.com", "logistics_manager" }
+				    }
+				)
+
+	annotation PBI_Id = e9e80f8561ff4104895dc38b1531ba8d
+

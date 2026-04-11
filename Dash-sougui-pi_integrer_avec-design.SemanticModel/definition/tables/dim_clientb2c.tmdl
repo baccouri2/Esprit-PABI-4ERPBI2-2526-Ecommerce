@@ -1,0 +1,46 @@
+table dim_clientb2c
+	lineageTag: 321345a5-a1a2-44f9-b996-a9752cd7ee6b
+
+	measure nbrCltB2c = COUNTROWS(dim_clientb2c)
+		formatString: 0
+		lineageTag: 71c568d1-c61c-451f-8255-785e04f92d9d
+
+	column pk_id_client
+		dataType: int64
+		formatString: 0
+		lineageTag: 5d816658-f870-467f-a5a7-1512bcaadb5b
+		summarizeBy: none
+		sourceColumn: pk_id_client
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_name
+		dataType: string
+		lineageTag: 6b30be48-a349-4856-80d3-6fde04969296
+		summarizeBy: none
+		sourceColumn: first_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column last_name
+		dataType: string
+		lineageTag: 01920f5f-f760-497d-86b0-e6d30a6b058d
+		summarizeBy: none
+		sourceColumn: last_name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_clientb2c = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Databases("hedire\MSSQLSERVER05"),
+				    dw_pi = Source{[Name="dw_pi"]}[Data],
+				    dbo_dim_clientb2c = dw_pi{[Schema="dbo",Item="dim_clientb2c"]}[Data]
+				in
+				    dbo_dim_clientb2c
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

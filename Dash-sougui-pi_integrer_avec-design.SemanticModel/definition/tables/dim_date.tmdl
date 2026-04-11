@@ -1,0 +1,125 @@
+table dim_date
+	lineageTag: 0fba1aa0-677c-48b7-bc7f-6b9df0cb20ce
+
+	measure today = TODAY()
+		formatString: General Date
+		lineageTag: 6ece90bd-88dd-4351-8e04-9c4107ab7134
+
+	measure 'Revenue YoY %' =
+			
+			VAR PrevRevenue =
+			    CALCULATE(
+			        [CA],
+			        SAMEPERIODLASTYEAR(dim_date[full_date])
+			    )
+			RETURN
+			DIVIDE([CA] - PrevRevenue, PrevRevenue)
+		lineageTag: 2ab84d9b-e511-49df-a4a1-c16f7c7ac681
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column pk_id_date
+		dataType: int64
+		formatString: 0
+		lineageTag: 3d045351-71b6-4b39-b72a-5761e8d61732
+		summarizeBy: none
+		sourceColumn: pk_id_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column full_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 55ef50f8-e3ef-45a5-ac4c-8dd1e42e4937
+		summarizeBy: none
+		sourceColumn: full_date
+
+		variation Variation
+			isDefault
+			relationship: 0d9bf3de-25d8-4059-8ba0-c70a4557053e
+			defaultHierarchy: LocalDateTable_9cbb6752-fb1f-4920-b39f-b44a2aafbb2c.'Hiérarchie de dates'
+
+		annotation SummarizationSetBy = Automatic
+
+	column day
+		dataType: int64
+		formatString: 0
+		lineageTag: 3ccc296f-50d6-40a0-b406-21cfb86104f7
+		summarizeBy: sum
+		sourceColumn: day
+
+		annotation SummarizationSetBy = Automatic
+
+	column month
+		dataType: int64
+		formatString: 0
+		lineageTag: 8e908cda-c48d-4e58-b256-8a01c214f68a
+		summarizeBy: sum
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	column trimester
+		dataType: int64
+		formatString: 0
+		lineageTag: ab0259aa-508d-4b7a-a7cc-614ad5ddd999
+		summarizeBy: sum
+		sourceColumn: trimester
+
+		annotation SummarizationSetBy = Automatic
+
+	column semester
+		dataType: int64
+		formatString: 0
+		lineageTag: 6dec9510-e9aa-4c9d-bf13-fe2b15c6380e
+		summarizeBy: sum
+		sourceColumn: semester
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: 279a1408-cfc2-4174-a849-ff9bb71bc417
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = User
+
+	column Mois =
+			
+			SWITCH(
+			    MONTH('dim_date'[full_date]),
+			    1, "January",
+			    2, "February",
+			    3, "March",
+			    4, "April",
+			    5, "May",
+			    6, "June",
+			    7, "July",
+			    8, "August",
+			    9, "September",
+			    10, "October",
+			    11, "November",
+			    12, "December",
+			    "Unknown"
+			)
+		lineageTag: 84732d55-bf18-434f-8cea-71a903e4535f
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_date = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("hedire\MSSQLSERVER05", "dw_pi"),
+				    dbo_dim_date = Source{[Schema="dbo",Item="dim_date"]}[Data],
+				    #"Type modifié" = Table.TransformColumnTypes(dbo_dim_date,{{"day", Int64.Type}, {"month", Int64.Type}, {"trimester", Int64.Type}, {"semester", Int64.Type}, {"year", Int64.Type}})
+				in
+				    #"Type modifié"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

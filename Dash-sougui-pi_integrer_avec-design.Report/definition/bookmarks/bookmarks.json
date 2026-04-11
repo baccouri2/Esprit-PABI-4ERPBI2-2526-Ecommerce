@@ -1,0 +1,19 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmarksMetadata/1.0.0/schema.json",
+  "items": [
+    {
+      "name": "780df050e8678ac772c6",
+      "displayName": "marketing",
+      "children": [
+        "965bc7f8658f7ae02fa0"
+      ]
+    },
+    {
+      "name": "4dfb170c1a08ce0378d3",
+      "displayName": "sales",
+      "children": [
+        "6b2b7cd5483e45e02025"
+      ]
+    }
+  ]
+}

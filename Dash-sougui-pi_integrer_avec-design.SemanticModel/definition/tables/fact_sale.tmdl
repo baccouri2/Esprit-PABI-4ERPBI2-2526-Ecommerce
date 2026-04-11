@@ -1,0 +1,271 @@
+table fact_sale
+	lineageTag: 3aaf6795-1d2a-4594-a7b7-6dbfe1bf5e08
+
+	measure avg_sales_per_cltb2b =
+			
+			AVERAGEX(
+			    VALUES(dim_clientb2b[pk_id_client]),
+			    CALCULATE(SUM(fact_sale[total_price]))
+			)
+		lineageTag: b8ad66ea-5b03-4ca3-bc2c-36d60e9d09e1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure avg_orders_b2b =
+			
+			DIVIDE(
+			    CALCULATE(DISTINCTCOUNT(dim_order[id_order]), dim_clientb2b),
+			    COUNTROWS(dim_clientb2b)
+			)
+		formatString: 0
+		lineageTag: c0c388bc-ab04-4c9c-9022-4c29c5139158
+
+	measure avg_orders_b2c =
+			
+			DIVIDE(
+			    CALCULATE(DISTINCTCOUNT(dim_order[id_order]), dim_clientb2c),
+			    COUNTROWS(dim_clientb2c)
+			)
+		formatString: 0
+		lineageTag: f075a26b-7580-453f-be7d-5a367576971e
+
+	measure Tx_cmd_non_terniné =
+			
+			DIVIDE(
+			    CALCULATE(COUNTROWS('dim_order'), 'dim_order'[order_status] = "En cours"),
+			    COUNTROWS('dim_order'),
+			    0
+			)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 74910805-0d0e-4fda-9f74-8d4fdba306cc
+
+	measure CA = SUM(CA[CA])
+		lineageTag: 7f4600d8-2f9f-48d3-a398-ecbb423bacf6
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Profit = [CA]- SUM(fact_purchace[total_payments_made])
+		formatString: #,0.00\ "DT";-#,0.00\ "DT";#,0.00\ "DT"
+		lineageTag: 7bef47e9-a4c3-4a61-b4e1-79f0dd055b13
+
+		annotation PBI_FormatHint = {"currencyCulture":"fr-TN"}
+
+	measure 'CA B2B' = [CA]-SUM(fact_sale[total_price])
+		lineageTag: 5049073c-23d8-4e54-8045-009660ad08f0
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'min quanity' = 1
+		formatString: 0
+		lineageTag: b9f3550e-6fe5-415f-923e-c062a199c5d3
+
+	measure 'sales number' = COUNTROWS(fact_sale)
+		formatString: 0
+		lineageTag: cafe0acd-18e1-4903-8245-ad265c131ee1
+
+	measure 'Total Revenue' =
+			
+			SUM(fact_sale[total_price])
+		lineageTag: cd0002ce-b9a0-4d6b-9237-db188ab9603b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Quantity' =
+			
+			SUM(fact_sale[quantity])
+		lineageTag: 717cade0-91f4-4c9f-8ac1-2d5d1b506e37
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Customers' =
+			
+			DISTINCTCOUNT(fact_sale[fk_clientB2C])
+		formatString: 0
+		lineageTag: ba39505e-0377-44ae-9ab5-36740faaf9a0
+
+	measure 'Returning Customers' =
+			
+			CALCULATE(
+			    DISTINCTCOUNT(fact_sale[fk_clientB2C]),
+			    FILTER(
+			        VALUES(fact_sale[fk_clientB2C]),
+			        CALCULATE(COUNT(fact_sale[fk_order])) > 1
+			    )
+			)
+		formatString: 0
+		lineageTag: 4bf3301b-5f2e-48c9-83f7-c692c5f1f27a
+
+	measure 'Profit Margin %' =
+			
+			DIVIDE([Profit], [CA], 0)
+		lineageTag: 0b0b4e4e-b3e4-4af3-87a3-5f222d7e9536
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Average Basket' =
+			
+			DIVIDE([CA], [Total Orders], 0)
+		lineageTag: f9a7e05f-2d49-49a5-96b4-d5eb37b537e1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column pk_id_sale
+		dataType: int64
+		formatString: 0
+		lineageTag: 84e51b85-1bb3-424b-884f-d740bb273178
+		summarizeBy: sum
+		sourceColumn: pk_id_sale
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_date
+		dataType: int64
+		formatString: 0
+		lineageTag: a8527080-73fd-4415-a1e5-1382a9b1dd9a
+		summarizeBy: none
+		sourceColumn: fk_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_place
+		dataType: int64
+		formatString: 0
+		lineageTag: 8edc9221-394e-4060-97cb-e0865b67dccb
+		summarizeBy: none
+		sourceColumn: fk_place
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_product
+		dataType: int64
+		formatString: 0
+		lineageTag: 23d9ff4e-ecd0-4bfd-be45-110c224a8fe2
+		summarizeBy: none
+		sourceColumn: fk_product
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_claim
+		dataType: int64
+		formatString: 0
+		lineageTag: 9b951429-689c-4891-99dd-eb79a4516bff
+		summarizeBy: none
+		sourceColumn: fk_claim
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_order
+		dataType: int64
+		formatString: 0
+		lineageTag: 4d555502-d65a-4e7a-888b-a14e3f02edbd
+		summarizeBy: sum
+		sourceColumn: fk_order
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_clientB2B
+		dataType: int64
+		formatString: 0
+		lineageTag: dc4d29fd-b11d-4d78-8e51-b6db94f181da
+		summarizeBy: none
+		sourceColumn: fk_clientB2B
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_clientB2C
+		dataType: int64
+		formatString: 0
+		lineageTag: 319cb6a7-b0b1-43cb-a6c3-04d69d745aa2
+		summarizeBy: none
+		sourceColumn: fk_clientB2C
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_channel
+		dataType: int64
+		formatString: 0
+		lineageTag: 18fa2aae-5368-4ce0-a985-110319eb7f98
+		summarizeBy: none
+		sourceColumn: fk_channel
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_invoice
+		dataType: int64
+		formatString: 0
+		lineageTag: 2b7448a9-ff14-41e4-b8e9-daa79d100c67
+		summarizeBy: none
+		sourceColumn: fk_invoice
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity
+		dataType: double
+		lineageTag: 597efcaa-a231-457f-8ac6-1879ad06b205
+		summarizeBy: sum
+		sourceColumn: quantity
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column tax_status
+		dataType: double
+		lineageTag: a1e5b581-0b26-4ecc-badc-2831caf76387
+		summarizeBy: sum
+		sourceColumn: tax_status
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column unit_price
+		dataType: double
+		lineageTag: 51da918c-0e3d-4487-b56b-033e538a48e3
+		summarizeBy: none
+		sourceColumn: unit_price
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column discount
+		dataType: double
+		lineageTag: aeb04f07-bebc-4259-9e22-20a15df7edd1
+		summarizeBy: sum
+		sourceColumn: discount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column total_price
+		dataType: double
+		lineageTag: c5c96d5f-dde6-42af-9047-d9016b5641ac
+		summarizeBy: none
+		sourceColumn: total_price
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition fact_sale = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Databases("hedire\MSSQLSERVER05"),
+				    dw_pi = Source{[Name="dw_pi"]}[Data],
+				    dbo_fact_sale = dw_pi{[Schema="dbo",Item="fact_sale"]}[Data],
+				    #"Type modifié" = Table.TransformColumnTypes(dbo_fact_sale,{{"quantity", type number}}),
+				    #"Colonnes supprimées" = Table.RemoveColumns(#"Type modifié",{"ugs"}),
+				    #"Valeur remplacée" = Table.ReplaceValue(#"Colonnes supprimées","0.00","0",Replacer.ReplaceText,{"tax_status"}),
+				    #"Type modifié1" = Table.TransformColumnTypes(#"Valeur remplacée",{{"tax_status", type number}}),
+				    #"Erreurs remplacées" = Table.ReplaceErrorValues(#"Type modifié1", {{"tax_status", 0}}),
+				    #"Type modifié2" = Table.TransformColumnTypes(#"Erreurs remplacées",{{"unit_price", type number}, {"discount", type number}, {"total_price", type number}})
+				in
+				    #"Type modifié2"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

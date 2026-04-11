@@ -1,0 +1,161 @@
+table dim_product
+	lineageTag: f77fed66-d877-442f-8a5f-74b8c6b7ffc3
+
+	measure 'Nb produits eco-friendly' =
+			
+			CALCULATE(
+			    COUNTROWS(dim_product),
+			    dim_product[prod_eco] = "eco-friendly"
+			)
+		formatString: 0
+		lineageTag: 710d5662-26e0-4c4d-a176-5d5b47136647
+
+	measure 'KPI Tx produits eco-friendly' = ```
+			
+			VAR NbEco = CALCULATE(
+			    COUNTROWS(dim_product), 
+			    dim_product[prod_eco] = "eco-friendly"
+			)
+			VAR NbTotal = COUNTROWS(dim_product)
+			RETURN
+			    DIVIDE(NbEco, NbTotal, 0)
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 81b45e89-9908-4912-943f-fec88c3a6680
+
+	measure 'Statut Tx produits eco' =
+			
+			VAR Actuel = [KPI Tx produits eco-friendly]
+			VAR Cible = 0.30
+			RETURN
+			    IF(Actuel >= Cible, "SDG12 and SDG15 objectives achieved", " Under")
+		lineageTag: 0f0ba347-c790-43fb-99ae-1185da560444
+
+	measure nbr_prod = COUNTROWS(dim_product)
+		formatString: 0
+		lineageTag: 5627f67c-8443-4d9c-bbc7-3956acb817eb
+
+	measure 'Tx canaux innovants' = ```
+			
+			VAR CanauxInnovants = 
+			    CALCULATE(
+			        SUM(fact_sale[total_price]),
+			        fact_sale[fk_channel] IN {2390, 2391}
+			    )
+			VAR VentesTotales = SUM(fact_sale[total_price])
+			RETURN
+			    DIVIDE( CanauxInnovants, VentesTotales, 0)
+			```
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: e488d3fa-a102-4581-96e2-18177c2765ba
+
+	measure 'Statut ODD9 Canaux Innovants' = ```
+			
+			VAR Tx = [Tx canaux innovants]
+			VAR Seuil = 0.80
+			VAR Statut = IF(Tx >= Seuil, "YES", "NO")
+			VAR Message = IF(Tx >= Seuil, 
+			    "SDG9 ACHIEVED - Target exceeded !",
+			    "SDG9 NOT ACHIEVED - Target: 80%"
+			)
+			RETURN
+			    Statut & " " & Message
+			```
+		lineageTag: 168f7a88-b0da-44af-a269-063f37e2a0db
+
+	measure 'Status SDG8 Economic Growth' = ```
+			
+			VAR Tx = [Tx croissance économique SDG8]
+			VAR Seuil = 0.50
+			RETURN
+			    IF(Tx >= Seuil, 
+			        " SDG8 achieved - Sustainable growth (>50% in current year)",
+			        " SDG8 not achieved - Target: >50% in 2025 - Current: " & FORMAT(Tx, "0%")
+			    )
+			```
+		lineageTag: 00e4efd2-74cf-4a3e-888b-1a933036d1b1
+
+	measure 'Tx croissance économique SDG8' = ```
+			
+			VAR VentesAnneeRecente = 
+			    CALCULATE(
+			        SUM(CA[CA]),
+			        CA[year] = 2025
+			    )
+			VAR VentesTotales = SUM(CA[CA])
+			RETURN
+			    DIVIDE(VentesAnneeRecente, VentesTotales, 0)
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 60823404-b070-4088-b8fc-da9e211e7071
+
+	measure 'Top Product' =
+			
+			TOPN(
+			    1,
+			    VALUES(dim_product[name_product]),
+			    [Total Revenue],
+			    DESC
+			)
+		lineageTag: ed5a47db-c23f-496d-8834-96ed747f2e14
+
+	column pk_id_product
+		dataType: int64
+		formatString: 0
+		lineageTag: ee5bc84f-c3f8-4df5-b9c1-7e8a90431457
+		summarizeBy: none
+		sourceColumn: pk_id_product
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_category
+		dataType: int64
+		formatString: 0
+		lineageTag: d259b25a-29eb-4045-8254-1c9d9bc645b4
+		summarizeBy: none
+		sourceColumn: fk_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column ref_product
+		dataType: string
+		lineageTag: 60dd9085-109d-44c9-88c6-af9a6d2b8dc4
+		summarizeBy: none
+		sourceColumn: ref_product
+
+		annotation SummarizationSetBy = Automatic
+
+	column name_product
+		dataType: string
+		lineageTag: 18405666-06f7-4113-a018-e5c41fb63226
+		summarizeBy: none
+		sourceColumn: name_product
+
+		annotation SummarizationSetBy = Automatic
+
+	column prod_eco =
+			
+			SWITCH(
+			    TRUE(),
+			    [fk_category] IN {10, 14, 17, 20, 22, 8}, "eco-friendly",
+			    "prod_normal"
+			)
+		lineageTag: e2dcc8d5-1bab-436b-8292-76f2d93cb324
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_product = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Databases("hedire\MSSQLSERVER05"),
+				    dw_pi = Source{[Name="dw_pi"]}[Data],
+				    dbo_dim_product = dw_pi{[Schema="dbo",Item="dim_product"]}[Data]
+				in
+				    dbo_dim_product
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
