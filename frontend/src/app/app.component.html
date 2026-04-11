@@ -1,0 +1,87 @@
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.open]="menuOpen">
+    <div class="logo-section">
+      <img src="/sougui_logo.png" alt="Sougui Logo" class="logo">
+      <h2 class="brand-name">Sougui Analytics</h2>
+    </div>
+
+    <nav class="nav-menu">
+      <a routerLink="/forecast" routerLinkActive="active" class="nav-item">
+        <span class="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </span>
+        <span class="label">Sales Forecasting</span>
+      </a>
+      <a routerLink="/segmentation" routerLinkActive="active" class="nav-item">
+        <span class="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </span>
+        <span class="label">Customer Insights</span>
+      </a>
+      <a routerLink="/anomaly" routerLinkActive="active" class="nav-item">
+        <span class="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </span>
+        <span class="label">Transaction Monitor</span>
+      </a>
+      <a routerLink="/promotion" routerLinkActive="active" class="nav-item">
+        <span class="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+            <polyline points="17 6 23 6 23 12"/>
+          </svg>
+        </span>
+        <span class="label">Campaign Impact</span>
+      </a>
+      <a routerLink="/recommendations" routerLinkActive="active" class="nav-item">
+        <span class="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </span>
+        <span class="label">Smart Suggestions</span>
+      </a>
+      <a routerLink="/sentiment" routerLinkActive="active" class="nav-item">
+        <span class="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </span>
+        <span class="label">Customer Feedback</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <p class="version">Version 1.0</p>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <button class="menu-toggle" (click)="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>
+
+<app-chatbot></app-chatbot>

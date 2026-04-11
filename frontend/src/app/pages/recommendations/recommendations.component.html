@@ -1,0 +1,140 @@
+<app-advice-popup *ngIf="advice" [advice]="advice" (closed)="advice = null"></app-advice-popup>
+
+<div class="page-header fade-in">
+  <div class="page-title-row">
+    <span class="page-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+    </span>
+    <h1>Smart Suggestions</h1>
+  </div>
+  <p class="subtitle">Discover what your customers are likely to buy next</p>
+</div>
+
+<!-- Settings -->
+<div class="card fade-in">
+  <h3>Choose a Customer</h3>
+
+  <div *ngIf="loadingClients" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading customers...</p>
+  </div>
+
+  <div *ngIf="!loadingClients" class="controls-grid">
+    <div class="control-group">
+      <label>Customer</label>
+      <select [(ngModel)]="selectedClientId" class="form-control">
+        <option *ngFor="let c of clients" [value]="c.client_id">
+          {{ c.client_name || 'Customer #' + c.client_id }}
+          ({{ c.client_type }})
+        </option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label>Number of Suggestions</label>
+      <input type="number" [(ngModel)]="topN" min="1" max="20" class="form-control">
+    </div>
+
+    <div class="control-group">
+      <button class="btn-primary" (click)="getRecommendations()"
+        [disabled]="loadingRecs || !selectedClientId">
+        <span *ngIf="!loadingRecs">Get Suggestions</span>
+        <span *ngIf="loadingRecs">Analyzing...</span>
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+</div>
+
+<!-- Results -->
+<div *ngIf="result" class="results-layout fade-in">
+
+  <!-- Recommendations -->
+  <div class="card">
+    <div class="section-header">
+      <h3>
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px">
+          <polyline points="20 12 20 22 4 22 4 12"/>
+          <rect x="2" y="7" width="20" height="5"/>
+          <line x1="12" y1="22" x2="12" y2="7"/>
+          <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+          <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+        </svg>
+        Recommended Products
+      </h3>
+      <p class="section-subtitle">
+        Based on what similar customers have purchased
+      </p>
+    </div>
+
+    <div *ngIf="result.recommendations.length === 0" class="empty-state">
+      <span class="empty-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </span>
+      <p>This customer has already explored all available products!</p>
+    </div>
+
+    <div class="rec-list">
+      <div *ngFor="let rec of result.recommendations; let i = index" class="rec-item">
+        <div class="rec-rank">#{{ i + 1 }}</div>
+        <div class="rec-info">
+          <div class="rec-name">{{ rec.name }}</div>
+          <div class="rec-category">{{ rec.category }}</div>
+          <div class="rec-bar-wrap">
+            <div class="rec-bar" [style.width.%]="getScorePercent(rec.score)"></div>
+          </div>
+        </div>
+        <div class="rec-score">
+          <span class="badge badge-info">{{ (getScorePercent(rec.score) | number:'1.0-0') }}% match</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Purchase History -->
+  <div class="card">
+    <div class="section-header">
+      <h3>
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px">
+          <circle cx="9" cy="21" r="1"/>
+          <circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+        Purchase History
+      </h3>
+      <p class="section-subtitle">
+        {{ result.client_name }} — {{ result.client_type }} customer
+      </p>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Category</th>
+            <th>Units Bought</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of result.purchase_history">
+            <td><strong>{{ item.name_product }}</strong></td>
+            <td>{{ item.name_category }}</td>
+            <td>
+              <span class="badge badge-success">{{ item.total_qty }} units</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

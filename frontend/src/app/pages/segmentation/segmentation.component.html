@@ -1,0 +1,92 @@
+<app-advice-popup *ngIf="advice" [advice]="advice" (closed)="advice = null"></app-advice-popup>
+
+<div class="page-header fade-in">
+  <div class="page-title-row">
+    <span class="page-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    </span>
+    <h1>Customer Insights</h1>
+  </div>
+  <p class="subtitle">Advanced customer segmentation for targeted marketing</p>
+</div>
+
+<div class="card fade-in">
+  <h3>Segmentation Settings</h3>
+  
+  <div class="controls-grid">
+    <div class="control-group">
+      <label>Number of Customer Groups</label>
+      <input type="number" [(ngModel)]="clusters" min="2" max="6" class="form-control">
+    </div>
+
+    <div class="control-group">
+      <button class="btn-primary" (click)="loadSegmentation()" [disabled]="loading">
+        <span *ngIf="!loading">Analyze Customers</span>
+        <span *ngIf="loading">Processing...</span>
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+</div>
+
+<div *ngIf="stats.length > 0" class="stats-grid fade-in">
+  <div *ngFor="let stat of stats" class="stat-card">
+    <div class="stat-header">
+      <h4>{{ stat.segment }}</h4>
+      <div class="customer-count">{{ stat.count }} customers</div>
+    </div>
+    <div class="stat-details">
+      <div class="stat-item">
+        <span class="label">Avg. Purchase Value</span>
+        <span class="value">{{ stat.avg_monetary | number:'1.0-0' }} DT</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Avg. Purchase Frequency</span>
+        <span class="value">{{ stat.avg_frequency | number:'1.1-1' }}x</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Days Since Last Purchase</span>
+        <span class="value">{{ stat.avg_recency | number:'1.0-0' }} days</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="customers.length > 0" class="card fade-in">
+  <h3>Customer List</h3>
+  
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Customer ID</th>
+          <th>Type</th>
+          <th>Last Purchase</th>
+          <th>Total Purchases</th>
+          <th>Lifetime Value</th>
+          <th>Segment</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let customer of customers">
+          <td><strong>#{{ customer.client_id }}</strong></td>
+          <td>{{ customer.client_type }}</td>
+          <td>{{ customer.recency }} days ago</td>
+          <td>{{ customer.frequency }} orders</td>
+          <td><strong>{{ customer.monetary | number:'1.0-0' }} DT</strong></td>
+          <td>
+            <span class="badge" [ngClass]="getSegmentClass(customer.segment)">
+              {{ customer.segment }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

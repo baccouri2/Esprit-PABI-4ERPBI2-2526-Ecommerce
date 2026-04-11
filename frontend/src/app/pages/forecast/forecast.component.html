@@ -1,0 +1,73 @@
+<app-advice-popup *ngIf="advice" [advice]="advice" (closed)="advice = null"></app-advice-popup>
+
+<div class="page-header fade-in">
+  <div class="page-title-row">
+    <span class="page-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+    </span>
+    <h1>Sales Forecasting</h1>
+  </div>
+  <p class="subtitle">Predict future sales by product, period, and region</p>
+</div>
+
+<div class="card fade-in">
+  <h3>Forecast Settings</h3>
+  
+  <div class="controls-grid">
+    <div class="control-group">
+      <label>Prediction Method</label>
+      <select [(ngModel)]="selectedModel" class="form-control">
+        <option *ngFor="let m of models" [value]="m.value">{{ m.label }}</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label>Weeks to Forecast</label>
+      <input type="number" [(ngModel)]="weeksAhead" min="1" max="26" class="form-control">
+    </div>
+
+    <div class="control-group">
+      <button class="btn-primary" (click)="runForecast()" [disabled]="loading">
+        <span *ngIf="!loading">Generate Forecast</span>
+        <span *ngIf="loading">Analyzing...</span>
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+</div>
+
+<div *ngIf="forecastData.length > 0" class="card fade-in">
+  <h3>Predicted Sales</h3>
+  
+  <div class="forecast-grid">
+    <div *ngFor="let item of forecastData" class="forecast-card">
+      <div class="week-label">Week of {{ item.date }}</div>
+      <div class="quantity-value">{{ item.quantity | number:'1.0-0' }}</div>
+      <div class="unit-label">units</div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="historicalData.length > 0" class="card fade-in">
+  <h3>Historical Performance</h3>
+  
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Week</th>
+          <th>Sales Volume</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of historicalData.slice(-10)">
+          <td>{{ item.date }}</td>
+          <td><strong>{{ item.quantity | number }}</strong> units</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

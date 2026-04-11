@@ -1,0 +1,119 @@
+<app-advice-popup *ngIf="advice" [advice]="advice" (closed)="advice = null"></app-advice-popup>
+
+<div class="page-header fade-in">
+  <div class="page-title-row">
+    <span class="page-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+        <polyline points="17 6 23 6 23 12"/>
+      </svg>
+    </span>
+    <h1>Campaign Impact</h1>
+  </div>
+  <p class="subtitle">Predict promotion impact on sales, basket value, and purchase frequency</p>
+</div>
+
+<div class="card fade-in">
+  <h3>Campaign Settings</h3>
+  
+  <div class="form-grid">
+    <div class="control-group">
+      <label>Prediction Method</label>
+      <select [(ngModel)]="selectedModel" class="form-control">
+        <option *ngFor="let m of models" [value]="m.value">{{ m.label }}</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label>Product Price (DT)</label>
+      <input type="number" [(ngModel)]="unitPrice" min="0" class="form-control">
+    </div>
+
+    <div class="control-group">
+      <label>Discount Percentage</label>
+      <input type="number" [(ngModel)]="discountRate" min="0" max="1" step="0.01" class="form-control">
+      <small class="helper-text">{{ getDiscountPercent() | number:'1.0-0' }}% off</small>
+    </div>
+
+    <div class="control-group">
+      <label>Day of Month (1-31)</label>
+      <input type="number" [(ngModel)]="day" min="1" max="31" class="form-control">
+    </div>
+
+    <div class="control-group">
+      <label>Month</label>
+      <select [(ngModel)]="month" class="form-control">
+        <option *ngFor="let m of months; let i = index" [value]="i + 1">{{ m }}</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label>Weekend Campaign?</label>
+      <select [(ngModel)]="isWeekend" class="form-control">
+        <option [value]="0">Weekday</option>
+        <option [value]="1">Weekend</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button class="btn-primary" (click)="predictImpact()" [disabled]="loading">
+      <span *ngIf="!loading">Calculate Impact</span>
+      <span *ngIf="loading">Calculating...</span>
+    </button>
+  </div>
+
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+</div>
+
+<div *ngIf="result" class="card fade-in result-card">
+  <h3>Predicted Campaign Results</h3>
+  
+  <div class="result-grid">
+    <div class="result-item primary">
+      <div class="result-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="3" width="15" height="13" rx="2"/>
+          <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+          <circle cx="5.5" cy="18.5" r="2.5"/>
+          <circle cx="18.5" cy="18.5" r="2.5"/>
+        </svg>
+      </div>
+      <div class="result-value">{{ result.predicted_quantity | number:'1.0-0' }}</div>
+      <div class="result-label">Expected Units Sold</div>
+    </div>
+
+    <div class="result-item">
+      <div class="result-label-small">Confidence Level</div>
+      <div class="result-value-small">{{ (result.metrics?.r2 * 100) | number:'1.0-0' }}%</div>
+    </div>
+
+    <div class="result-item">
+      <div class="result-label-small">Margin of Error</div>
+      <div class="result-value-small">± {{ result.metrics?.mae | number:'1.0-0' }} units</div>
+    </div>
+
+    <div class="result-item">
+      <div class="result-label-small">Typical Variance</div>
+      <div class="result-value-small">± {{ result.metrics?.rmse | number:'1.0-0' }} units</div>
+    </div>
+  </div>
+
+  <div class="campaign-summary">
+    <h4>Campaign Summary</h4>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <span class="label">Product Price:</span>
+        <span class="value">{{ result.input?.unit_price | number:'1.2-2' }} DT</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Discount Applied:</span>
+        <span class="value">{{ (result.input?.discount_rate * 100) | number:'1.0-0' }}%</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Estimated Revenue:</span>
+        <span class="value">{{ (result.predicted_quantity * result.input?.unit_price * (1 - result.input?.discount_rate)) | number:'1.0-0' }} DT</span>
+      </div>
+    </div>
+  </div>
+</div>
