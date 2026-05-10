@@ -1,0 +1,309 @@
+<app-advice-popup *ngIf="advice" [advice]="advice" (closed)="advice = null"></app-advice-popup>
+
+<div class="page-header fade-in">
+  <div class="page-title-row">
+    <span class="page-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+    </span>
+    <h1>{{ translate.translate('assistant.recommendations.title') }}</h1>
+  </div>
+  <p class="subtitle">{{ translate.translate('assistant.recommendations.description') }}</p>
+</div>
+
+<!-- Settings -->
+<div class="card fade-in">
+  <h3>{{ translate.translate('assistant.recommendations.selectClient') }}</h3>
+
+  <div *ngIf="loadingClients" class="loading-state">
+    <div class="spinner"></div>
+    <p>{{ translate.translate('common.loading') }}</p>
+  </div>
+
+  <div *ngIf="!loadingClients" class="controls-grid">
+    <div class="control-group">
+      <label>{{ translate.translate('orders.client') }}</label>
+      <select [(ngModel)]="selectedClientId" class="form-control">
+        <option *ngFor="let c of clients" [value]="c.client_id">
+          {{ c.client_name || 'Customer #' + c.client_id }}
+          ({{ c.client_type }})
+        </option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label>{{ translate.translate('assistant.recommendations.score') }}</label>
+      <input type="number" [(ngModel)]="topN" min="1" max="20" class="form-control">
+    </div>
+
+    <div class="control-group">
+      <button class="btn-primary" (click)="getRecommendations()"
+        [disabled]="loadingRecs || !selectedClientId">
+        <span *ngIf="!loadingRecs">{{ translate.translate('assistant.recommendations.getRecommendations') }}</span>
+        <span *ngIf="loadingRecs">{{ translate.translate('assistant.forecast.analyzing') }}</span>
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+</div>
+
+<!-- Export Button -->
+<div class="card fade-in" *ngIf="result || competitionRecommendations.length > 0">
+  <button class="btn-export" (click)="exportPDF()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px;display:inline">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="7 10 12 15 17 10"/>
+      <line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
+    {{ translate.translate('common.export') }}
+  </button>
+</div>
+
+<!-- Results -->
+<div *ngIf="result" class="results-layout fade-in">
+
+  <!-- Recommendations -->
+  <div class="card">
+    <div class="section-header">
+      <h3>
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px">
+          <polyline points="20 12 20 22 4 22 4 12"/>
+          <rect x="2" y="7" width="20" height="5"/>
+          <line x1="12" y1="22" x2="12" y2="7"/>
+          <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+          <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+        </svg>
+        {{ translate.translate('assistant.recommendations.recommendedProducts') }}
+      </h3>
+      <p class="section-subtitle">
+        {{ translate.translate('assistant.recommendations.description') }}
+      </p>
+    </div>
+
+    <div *ngIf="result.recommendations.length === 0" class="empty-state">
+      <span class="empty-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </span>
+      <p>{{ translate.translate('clients.noClients') }}</p>
+    </div>
+
+    <div class="rec-list">
+      <div *ngFor="let rec of result.recommendations; let i = index" class="rec-item">
+        <div class="rec-rank">#{{ i + 1 }}</div>
+        <div class="rec-info">
+          <div class="rec-name">{{ rec.name }}</div>
+          <div class="rec-category">{{ rec.category }}</div>
+          <div class="rec-bar-wrap">
+            <div class="rec-bar" [style.width.%]="getScorePercent(rec.score)"></div>
+          </div>
+        </div>
+        <div class="rec-score">
+          <span class="badge badge-info">{{ (getScorePercent(rec.score) | number:'1.0-0') }}% match</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Purchase History -->
+  <div class="card">
+    <div class="section-header">
+      <h3>
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px">
+          <circle cx="9" cy="21" r="1"/>
+          <circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+        {{ translate.translate('orders.title') }}
+      </h3>
+      <p class="section-subtitle">
+        {{ result.client_name }} — {{ result.client_type }}
+      </p>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ translate.translate('products.productName') }}</th>
+            <th>{{ translate.translate('products.category') }}</th>
+            <th>{{ translate.translate('orders.table.items') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of result.purchase_history">
+            <td><strong>{{ item.name_product }}</strong></td>
+            <td>{{ item.name_category }}</td>
+            <td>
+              <span class="badge badge-success">{{ item.total_qty }} {{ translate.translate('assistant.forecast.units') }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Competition & International Analysis -->
+<div class="card fade-in" style="margin-top: 32px;">
+  <div class="section-header">
+    <h3>
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+        <polyline points="2 17 12 22 22 17"/>
+        <polyline points="2 12 12 17 22 12"/>
+      </svg>
+      {{ translate.translate('assistant.competition.title') }}
+    </h3>
+    <p class="section-subtitle">{{ translate.translate('assistant.competition.description') }}</p>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn" [class.active]="competitionTab === 'competition'" (click)="competitionTab = 'competition'">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px;display:inline">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+      {{ translate.translate('assistant.competition.analyze') }}
+    </button>
+    <button class="tab-btn" [class.active]="competitionTab === 'international'" (click)="competitionTab = 'international'">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px;display:inline">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        <path d="M2 12h20"/>
+      </svg>
+      {{ translate.translate('products.price') }}
+    </button>
+  </div>
+
+  <!-- Competition Analysis Tab -->
+  <div *ngIf="competitionTab === 'competition'" class="competition-section">
+    <div class="controls-grid">
+      <div class="control-group">
+        <label>{{ translate.translate('assistant.recommendations.score') }}</label>
+        <select [(ngModel)]="competitionTopN" class="form-control">
+          <option [value]="5">Top 5</option>
+          <option [value]="10">Top 10</option>
+          <option [value]="20">Top 20</option>
+          <option [value]="30">Top 30</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>&nbsp;</label>
+        <button class="btn-primary" (click)="loadCompetitionRecommendations()" [disabled]="competitionLoading">
+          <span *ngIf="competitionLoading">{{ translate.translate('assistant.forecast.analyzing') }}</span>
+          <span *ngIf="!competitionLoading">{{ translate.translate('assistant.competition.analyze') }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="competitionRecommendations.length > 0" class="rec-list" style="margin-top: 20px;">
+      <div *ngFor="let p of competitionRecommendations; let i = index" class="rec-item">
+        <div class="rec-rank">#{{ i + 1 }}</div>
+        <div class="rec-info">
+          <div class="rec-name">{{ p.name }}</div>
+          <div class="rec-meta">
+            <span class="badge badge-info">{{ p.category }}</span>
+            <span class="rec-price">{{ p.price }} DT</span>
+          </div>
+        </div>
+        <div class="rec-prob">
+          <div class="prob-bar-bg">
+            <div class="prob-bar-fill" [style.width.%]="p.probability" [style.background]="getProbabilityColor(p.probability)"></div>
+          </div>
+          <div class="prob-labels">
+            <span class="prob-pct">{{ p.probability }}%</span>
+            <span class="prob-lbl" [style.color]="getProbabilityColor(p.probability)">{{ getProbabilityLabel(p.probability) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- International Pricing Tab -->
+  <div *ngIf="competitionTab === 'international'" class="international-section">
+    <div class="controls-grid">
+      <div class="control-group">
+        <label>{{ translate.translate('products.category') }}</label>
+        <select [(ngModel)]="selectedCategory" class="form-control">
+          <option *ngFor="let cat of categories" [value]="cat.category">
+            {{ cat.category }} — {{ cat.product_count }} {{ translate.translate('products.title') }}
+          </option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>&nbsp;</label>
+        <button class="btn-primary" (click)="getCategoryPrice()" [disabled]="categoryLoading || !selectedCategory">
+          <span *ngIf="categoryLoading">{{ translate.translate('common.loading') }}</span>
+          <span *ngIf="!categoryLoading">{{ translate.translate('assistant.competition.analyze') }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="categoryPrice" style="margin-top: 20px;">
+      <h4 style="color: #E8EAF6; margin-bottom: 16px;">{{ categoryPrice.category }} — Pricing Analysis</h4>
+      <div class="price-grid">
+        <div class="price-box avg">
+          <div class="price-icon-lbl">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;display:inline">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            Average Price
+          </div>
+          <div class="price-big">{{ categoryPrice.avg_price }} DT</div>
+          <div class="price-sub">Market benchmark</div>
+        </div>
+        <div class="price-box min">
+          <div class="price-icon-lbl">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;display:inline">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              <polyline points="17 6 23 6 23 12"/>
+            </svg>
+            Minimum Price
+          </div>
+          <div class="price-big">{{ categoryPrice.min_price }} DT</div>
+          <div class="price-sub">Budget segment</div>
+        </div>
+        <div class="price-box max">
+          <div class="price-icon-lbl">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;display:inline">
+              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
+              <polyline points="17 18 23 18 23 12"/>
+            </svg>
+            Maximum Price
+          </div>
+          <div class="price-big">{{ categoryPrice.max_price }} DT</div>
+          <div class="price-sub">Premium segment</div>
+        </div>
+      </div>
+      <div class="info-table">
+        <div class="info-row">
+          <span>Products in Category</span>
+          <strong>{{ categoryPrice.product_count }}</strong>
+        </div>
+        <div class="info-row">
+          <span>Total Units Sold</span>
+          <strong>{{ formatNumber(categoryPrice.total_sold) }}</strong>
+        </div>
+        <div class="info-row">
+          <span>Price Range</span>
+          <strong>{{ (categoryPrice.max_price - categoryPrice.min_price).toFixed(2) }} DT</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SDG Footer -->
+<app-sdg-footer 
+  [sdgNumber]="12"
+  [customDescription]="'This recommendation system promotes responsible consumption and production by providing intelligent product suggestions that optimize purchasing decisions and reduce waste.'">
+</app-sdg-footer>

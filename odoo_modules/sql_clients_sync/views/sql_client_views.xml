@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Tree View -->
+        <record id="view_sql_client_tree" model="ir.ui.view">
+            <field name="name">SQL Client Sync Tree</field>
+            <field name="model">sql.client.sync</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="client_type"/>
+                    <field name="company" optional="show"/>
+                    <field name="mf" optional="show"/>
+                    <field name="date_participation"/>
+                    <field name="order_count"/>
+                    <field name="synced_to_odoo"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_sql_client_form" model="ir.ui.view">
+            <field name="name">SQL Client Sync Form</field>
+            <field name="model">sql.client.sync</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_sync_to_odoo" type="object" string="Sync to Odoo" 
+                                class="oe_highlight" attrs="{'invisible': [('synced_to_odoo', '=', True)]}"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="sql_id" readonly="1"/>
+                                <field name="client_type" readonly="1"/>
+                                <field name="date_participation" readonly="1"/>
+                                <field name="order_count" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="synced_to_odoo" readonly="1"/>
+                                <field name="odoo_partner_id" readonly="1"/>
+                                <field name="sync_date" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Details" attrs="{'invisible': [('client_type', '!=', 'b2b')]}">
+                            <field name="company" readonly="1"/>
+                            <field name="mf" readonly="1"/>
+                        </group>
+                        <group string="Details" attrs="{'invisible': [('client_type', '!=', 'b2c')]}">
+                            <field name="first_name" readonly="1"/>
+                            <field name="last_name" readonly="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_sql_client_search" model="ir.ui.view">
+            <field name="name">SQL Client Sync Search</field>
+            <field name="model">sql.client.sync</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name" string="Name"/>
+                    <field name="company" string="Company"/>
+                    <field name="mf" string="MF"/>
+                    <separator/>
+                    <filter name="b2b" string="B2B" domain="[('client_type', '=', 'b2b')]"/>
+                    <filter name="b2c" string="B2C" domain="[('client_type', '=', 'b2c')]"/>
+                    <separator/>
+                    <filter name="synced" string="Synced" domain="[('synced_to_odoo', '=', True)]"/>
+                    <filter name="not_synced" string="Not Synced" domain="[('synced_to_odoo', '=', False)]"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_sql_client_sync" model="ir.actions.act_window">
+            <field name="name">SQL Server Clients</field>
+            <field name="res_model">sql.client.sync</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No clients found. Click "Sync from SQL Server" to import clients.
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

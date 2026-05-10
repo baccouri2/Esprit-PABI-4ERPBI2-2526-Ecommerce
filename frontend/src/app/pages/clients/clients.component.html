@@ -1,0 +1,195 @@
+<!-- Success / Error banners -->
+<div class="banner success" *ngIf="success">✅ {{ success }}</div>
+<div class="banner error"   *ngIf="error && !loading">⚠️ {{ error }}</div>
+
+<!-- Header -->
+<div class="page-header fade-in">
+  <div class="page-title-row">
+    <span class="page-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    </span>
+    <h1>{{ translate.translate('clients.title') }}</h1>
+  </div>
+  <p class="subtitle">{{ translate.translate('clients.subtitle') }}</p>
+</div>
+
+<!-- KPI cards -->
+<div class="kpi-row fade-in">
+  <div class="kpi-card">
+    <div class="kpi-value">{{ clients.length }}</div>
+    <div class="kpi-label">{{ translate.translate('clients.kpi.totalClients') }}</div>
+  </div>
+  <div class="kpi-card b2b">
+    <div class="kpi-value">{{ b2bCount }}</div>
+    <div class="kpi-label">{{ translate.translate('clients.kpi.b2bClients') }}</div>
+  </div>
+  <div class="kpi-card b2c">
+    <div class="kpi-value">{{ b2cCount }}</div>
+    <div class="kpi-label">{{ translate.translate('clients.kpi.b2cClients') }}</div>
+  </div>
+</div>
+
+<!-- Toolbar -->
+<div class="toolbar fade-in">
+  <div class="toolbar-left">
+    <div class="search-box">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" [(ngModel)]="searchQ" (ngModelChange)="onSearch()" [placeholder]="translate.translate('clients.searchPlaceholder')">
+    </div>
+
+    <div class="filter-tabs">
+      <button [class.active]="filterType==='all'" (click)="onFilterType('all')">{{ translate.translate('clients.filters.all') }}</button>
+      <button [class.active]="filterType==='b2b'" (click)="onFilterType('b2b')">B2B</button>
+      <button [class.active]="filterType==='b2c'" (click)="onFilterType('b2c')">B2C</button>
+    </div>
+  </div>
+
+  <div class="toolbar-right">
+    <button class="btn-add b2b" (click)="openCreate('b2b')" *ngIf="permissions.create">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      {{ translate.translate('clients.addB2B') }}
+    </button>
+    <button class="btn-add b2c" (click)="openCreate('b2c')" *ngIf="permissions.create">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      {{ translate.translate('clients.addB2C') }}
+    </button>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="card fade-in">
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>{{ translate.translate('common.loading') }}</p>
+  </div>
+
+  <div *ngIf="!loading && filtered.length === 0" class="empty-state">
+    <p>{{ translate.translate('clients.noClients') }}</p>
+  </div>
+
+  <div *ngIf="!loading && filtered.length > 0" class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>{{ translate.translate('clients.table.type') }}</th>
+          <th>{{ translate.translate('clients.table.nameCompany') }}</th>
+          <th>{{ translate.translate('clients.table.mfDetails') }}</th>
+          <th>{{ translate.translate('clients.table.participationDate') }}</th>
+          <th>{{ translate.translate('clients.table.orders') }}</th>
+          <th>{{ translate.translate('common.actions') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of filtered">
+          <td><strong>#{{ c.id }}</strong></td>
+          <td>
+            <span class="badge" [class.badge-b2b]="c.type==='B2B'" [class.badge-b2c]="c.type==='B2C'">
+              {{ c.type }}
+            </span>
+          </td>
+          <td><strong>{{ clientName(c) }}</strong></td>
+          <td class="muted">{{ c.type === 'B2B' ? (c.MF || '—') : (c.first_name + ' ' + c.last_name) }}</td>
+          <td>{{ c.date_participation || '—' }}</td>
+          <td>
+            <span class="order-badge">{{ c.order_count }}</span>
+          </td>
+          <td class="actions">
+            <button class="btn-icon edit" (click)="openEdit(c)" [title]="translate.translate('common.edit')" *ngIf="permissions.update">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="btn-icon delete" (click)="confirmDelete(c)" [title]="translate.translate('common.delete')" [disabled]="c.order_count > 0" *ngIf="permissions.delete">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>
+            <span class="view-only-badge" *ngIf="!permissions.update && !permissions.delete">{{ translate.translate('clients.viewOnly') }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Create / Edit Modal -->
+<div class="modal-overlay" *ngIf="modalMode" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ modalMode === 'create' ? translate.translate('clients.modal.add') : translate.translate('clients.modal.edit') }} {{ modalType.toUpperCase() }} {{ translate.translate('clients.modal.client') }}</h3>
+      <button class="modal-close" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="modal-error" *ngIf="modalError">⚠️ {{ modalError }}</div>
+
+      <!-- B2B fields -->
+      <ng-container *ngIf="modalType === 'b2b'">
+        <div class="form-group">
+          <label>{{ translate.translate('clients.modal.mf') }}</label>
+          <input type="text" [(ngModel)]="form.MF" [placeholder]="translate.translate('clients.modal.mfPlaceholder')">
+        </div>
+        <div class="form-group">
+          <label>{{ translate.translate('clients.modal.companyName') }} <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="form.company" [placeholder]="translate.translate('clients.modal.companyPlaceholder')">
+        </div>
+      </ng-container>
+
+      <!-- B2C fields -->
+      <ng-container *ngIf="modalType === 'b2c'">
+        <div class="form-group">
+          <label>{{ translate.translate('clients.modal.firstName') }} <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="form.first_name" [placeholder]="translate.translate('clients.modal.firstNamePlaceholder')">
+        </div>
+        <div class="form-group">
+          <label>{{ translate.translate('clients.modal.lastName') }} <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="form.last_name" [placeholder]="translate.translate('clients.modal.lastNamePlaceholder')">
+        </div>
+      </ng-container>
+
+      <!-- Common field -->
+      <div class="form-group">
+        <label>{{ translate.translate('clients.modal.participationDate') }}</label>
+        <input type="date" [(ngModel)]="form.date_participation">
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">{{ translate.translate('common.cancel') }}</button>
+      <button class="btn-save" (click)="save()" [disabled]="saving">
+        <span *ngIf="!saving">{{ modalMode === 'create' ? translate.translate('common.create') : translate.translate('clients.modal.saveChanges') }}</span>
+        <span *ngIf="saving">{{ translate.translate('clients.modal.saving') }}</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" *ngIf="deleteTarget" (click)="cancelDelete()">
+  <div class="modal modal-sm" (click)="$event.stopPropagation()">
+    <div class="modal-header danger">
+      <h3>{{ translate.translate('clients.deleteModal.title') }}</h3>
+      <button class="modal-close" (click)="cancelDelete()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>{{ translate.translate('clients.deleteModal.confirmText') }} <strong>{{ clientName(deleteTarget) }}</strong>?</p>
+      <p class="muted">{{ translate.translate('clients.deleteModal.warning') }}</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="cancelDelete()">{{ translate.translate('common.cancel') }}</button>
+      <button class="btn-delete" (click)="doDelete()" [disabled]="deleting">
+        {{ deleting ? translate.translate('clients.deleteModal.deleting') : translate.translate('common.delete') }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SDG Footer -->
+<app-sdg-footer 
+  [sdgNumber]="12"
+  [customDescription]="'This client management system promotes responsible consumption and production by enabling efficient customer relationship management and sustainable business practices.'">
+</app-sdg-footer>

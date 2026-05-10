@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sougui Analytics - Mobile App Cover</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        .cover-container {
+            width: 1920px;
+            height: 1080px;
+            background: linear-gradient(135deg, #0f1923 0%, #1a2942 50%, #2d3e5f 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated background particles */
+        .particle {
+            position: absolute;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .particle:nth-child(1) { width: 300px; height: 300px; top: -100px; left: -100px; animation-delay: 0s; }
+        .particle:nth-child(2) { width: 200px; height: 200px; top: 200px; right: -50px; animation-delay: 3s; }
+        .particle:nth-child(3) { width: 250px; height: 250px; bottom: -80px; left: 30%; animation-delay: 6s; }
+        .particle:nth-child(4) { width: 180px; height: 180px; top: 50%; right: 20%; animation-delay: 9s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+            50% { transform: translateY(-30px) scale(1.1); opacity: 0.5; }
+        }
+
+        /* Grid pattern overlay */
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.5;
+        }
+
+        /* Content container */
+        .content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 80px;
+        }
+
+        /* Logo */
+        .logo {
+            width: 180px;
+            height: 180px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.4);
+            animation: pulse 3s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 20px 60px rgba(59, 130, 246, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 25px 80px rgba(59, 130, 246, 0.6); }
+        }
+
+        /* Title */
+        .title {
+            font-size: 120px;
+            font-weight: 900;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .title .gradient-text {
+            background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Subtitle */
+        .subtitle {
+            font-size: 42px;
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 60px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        /* Features grid */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            max-width: 1600px;
+            margin-bottom: 60px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 24px;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            font-size: 16px;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+
+        /* Bottom badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 20px 40px;
+            border-radius: 50px;
+            font-size: 28px;
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        .badge-icon {
+            font-size: 36px;
+        }
+
+        /* Decorative elements */
+        .deco-circle {
+            position: absolute;
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-radius: 50%;
+            animation: rotate 30s linear infinite;
+        }
+
+        .deco-circle-1 {
+            width: 600px;
+            height: 600px;
+            top: -200px;
+            right: -200px;
+        }
+
+        .deco-circle-2 {
+            width: 400px;
+            height: 400px;
+            bottom: -150px;
+            left: -150px;
+            animation-direction: reverse;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="cover-container">
+        <!-- Animated particles -->
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+
+        <!-- Grid overlay -->
+        <div class="grid-overlay"></div>
+
+        <!-- Decorative circles -->
+        <div class="deco-circle deco-circle-1"></div>
+        <div class="deco-circle deco-circle-2"></div>
+
+        <!-- Main content -->
+        <div class="content">
+            <!-- Logo -->
+            <div class="logo">S</div>
+
+            <!-- Title -->
+            <h1 class="title">
+                Sougui <span class="gradient-text">Analytics</span>
+            </h1>
+
+            <!-- Subtitle -->
+            <p class="subtitle">AI-Powered Business Intelligence Platform</p>
+
+            <!-- Features -->
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-title">Dashboard</div>
+                    <div class="feature-desc">Real-time insights</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <div class="feature-title">AI Assistant</div>
+                    <div class="feature-desc">Smart predictions</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💼</div>
+                    <div class="feature-title">CRM Odoo</div>
+                    <div class="feature-desc">Sales pipeline</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <div class="feature-title">Face ID</div>
+                    <div class="feature-desc">Secure login</div>
+                </div>
+            </div>
+
+            <!-- Bottom badge -->
+            <div class="badge">
+                <span class="badge-icon">🚀</span>
+                <span>Transform Your Business Data</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add slight parallax effect on mouse move
+        document.addEventListener('mousemove', (e) => {
+            const particles = document.querySelectorAll('.particle');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            particles.forEach((particle, index) => {
+                const speed = (index + 1) * 10;
+                particle.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+            });
+        });
+    </script>
+</body>
+</html>

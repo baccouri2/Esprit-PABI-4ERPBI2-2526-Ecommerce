@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The BI Masters - Logo Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            padding: 40px;
+            color: white;
+        }
+
+        .controls {
+            max-width: 800px;
+            margin: 0 auto 40px;
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #60a5fa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(135deg, #60a5fa, #f472b6);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(96, 165, 250, 0.1);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            border-radius: 8px;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        .preview {
+            max-width: 100%;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .preview img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .dimension-label {
+            margin-top: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #60a5fa;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h1>📊 The BI Masters Logo Generator</h1>
+        <p style="color: #94a3b8; margin-bottom: 20px;">Generate logo in standard dimensions</p>
+        
+        <div class="button-group">
+            <button onclick="generateLogo(1080, 1080)">
+                🔲 1080 x 1080 (Square)
+            </button>
+            <button onclick="generateLogo(1024, 450)">
+                📱 1024 x 450 (Wide)
+            </button>
+            <button onclick="generateLogo(1920, 1080)">
+                🖥️ 1920 x 1080 (HD)
+            </button>
+            <button onclick="generateLogo(2560, 1440)">
+                🖥️ 2560 x 1440 (2K)
+            </button>
+            <button onclick="generateLogo(3840, 2160)">
+                🖥️ 3840 x 2160 (4K)
+            </button>
+        </div>
+
+        <div class="info">
+            ✨ Click a button to generate and download the logo!
+        </div>
+    </div>
+
+    <div class="preview" id="preview"></div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        function generateLogo(width, height) {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set exact dimensions
+            canvas.width = width;
+            canvas.height = height;
+
+            // Dark background with gradient
+            const bgGradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width/2);
+            bgGradient.addColorStop(0, '#0a1929');
+            bgGradient.addColorStop(0.5, '#0f1923');
+            bgGradient.addColorStop(1, '#000000');
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, width, height);
+
+            // Add atmospheric glow
+            const glowGradient = ctx.createRadialGradient(width/2, height/3, 0, width/2, height/3, width/3);
+            glowGradient.addColorStop(0, 'rgba(96, 165, 250, 0.15)');
+            glowGradient.addColorStop(1, 'rgba(96, 165, 250, 0)');
+            ctx.fillStyle = glowGradient;
+            ctx.fillRect(0, 0, width, height);
+
+            const scale = width / 1024;
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            // Bar chart icon - positioned above text
+            const barWidth = 30 * scale;
+            const barSpacing = 12 * scale;
+            const startX = centerX - (barWidth * 1.5 + barSpacing);
+            const baseY = centerY - 60 * scale;
+
+            // Bar heights and colors
+            const bars = [
+                { height: 50 * scale, color: '#5fb3d3' },
+                { height: 75 * scale, color: '#6fc5e0' },
+                { height: 100 * scale, color: '#7fd7ed' }
+            ];
+
+            // Draw bars with glow
+            bars.forEach((bar, index) => {
+                const x = startX + index * (barWidth + barSpacing);
+                const y = baseY - bar.height;
+
+                // Strong glow effect
+                ctx.shadowColor = bar.color;
+                ctx.shadowBlur = 30 * scale;
+                ctx.fillStyle = bar.color;
+                ctx.fillRect(x, y, barWidth, bar.height);
+            });
+            ctx.shadowBlur = 0;
+
+            // Text "the bi masters"
+            const fontSize = 80 * scale;
+            ctx.font = `300 ${fontSize}px Arial, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Create gradient for text
+            const textGradient = ctx.createLinearGradient(
+                centerX - 400 * scale, 0,
+                centerX + 400 * scale, 0
+            );
+            textGradient.addColorStop(0, '#5fb3d3');
+            textGradient.addColorStop(0.5, '#7fd7ed');
+            textGradient.addColorStop(1, '#94a3b8');
+            
+            // Text with glow
+            ctx.shadowColor = 'rgba(95, 179, 211, 0.5)';
+            ctx.shadowBlur = 20 * scale;
+            ctx.fillStyle = textGradient;
+            ctx.fillText('the bi masters', centerX, centerY + 60 * scale);
+            ctx.shadowBlur = 0;
+
+            // Convert to image and download
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `the-bi-masters-logo-${width}x${height}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                // Show preview
+                const preview = document.getElementById('preview');
+                preview.innerHTML = `
+                    <div class="dimension-label">✅ Downloaded: ${width} x ${height} pixels</div>
+                    <img src="${url}" alt="Preview">
+                `;
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<app-advice-popup *ngIf="advice" [advice]="advice" (closed)="advice = null"></app-advice-popup>
+
+<div class="page-header fade-in">
+  <div class="page-title-row">
+    <span class="page-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+    </span>
+    <h1>Transaction Monitor</h1>
+  </div>
+  <p class="subtitle">Anomaly detection in transactions, invoices, and orders</p>
+</div>
+
+<div class="card fade-in">
+  <h3>Detection Settings</h3>
+  
+  <div class="controls-grid">
+    <div class="control-group">
+      <label>Detection Method</label>
+      <select [(ngModel)]="selectedModel" class="form-control">
+        <option *ngFor="let m of models" [value]="m.value">{{ m.label }}</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label>Sensitivity (Low = 0.01 → High = 0.5)</label>
+      <input type="number" [(ngModel)]="sensitivity" min="0.01" max="0.5" step="0.01" class="form-control">
+    </div>
+
+    <div class="control-group">
+      <button class="btn-primary" (click)="detectAnomalies()" [disabled]="loading">
+        <span *ngIf="!loading">Scan Transactions</span>
+        <span *ngIf="loading">Scanning...</span>
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+</div>
+
+<div *ngIf="totalCount > 0" class="metrics-grid fade-in">
+  <div class="metric-card">
+    <div class="metric-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+        <line x1="3" y1="9" x2="21" y2="9"/>
+        <line x1="9" y1="21" x2="9" y2="9"/>
+      </svg>
+    </div>
+    <div class="metric-value">{{ totalCount | number }}</div>
+    <div class="metric-label">Total Transactions</div>
+  </div>
+
+  <div class="metric-card alert">
+    <div class="metric-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+    </div>
+    <div class="metric-value">{{ anomalyCount | number }}</div>
+    <div class="metric-label">Suspicious Transactions</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+        <polyline points="17 6 23 6 23 12"/>
+      </svg>
+    </div>
+    <div class="metric-value">{{ getAnomalyRate() | number:'1.1-1' }}%</div>
+    <div class="metric-label">Flagged Rate</div>
+  </div>
+</div>
+
+<div *ngIf="anomalies.length > 0" class="card fade-in">
+  <h3>Suspicious Transactions</h3>
+  
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Transaction ID</th>
+          <th>Date</th>
+          <th>Quantity</th>
+          <th>Unit Price</th>
+          <th>Discount</th>
+          <th>Total Amount</th>
+          <th>Risk Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of anomalies.slice(0, 50)" class="anomaly-row">
+          <td><strong>#{{ item.id }}</strong></td>
+          <td>{{ item.date }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.unit_price | number:'1.2-2' }} DT</td>
+          <td>{{ (item.discount_rate * 100) | number:'1.0-0' }}%</td>
+          <td><strong>{{ item.total_price | number:'1.2-2' }} DT</strong></td>
+          <td>
+            <span class="badge badge-danger">{{ item.anomaly_score | number:'1.4-4' }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

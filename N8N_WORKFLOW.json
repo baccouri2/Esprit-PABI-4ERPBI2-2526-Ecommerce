@@ -1,0 +1,737 @@
+{
+  "name": "My workflowSOUGUI",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -224,
+        80
+      ],
+      "id": "2e6efe3f-4a0a-4e95-bb3c-47508d4186bb",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://enhance-twice-excess.ngrok-free.dev/api/data",
+        "options": {}
+      },
+      "id": "fca4ab80-0026-4225-a064-946897d4b503",
+      "name": "Get Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        0,
+        -16
+      ],
+      "executeOnce": true,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://enhance-twice-excess.ngrok-free.dev/api/forecast/predict",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{ \"Content-Type\": \"application/json\" }",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"model\": \"xgboost\",\n  \"steps\": 4\n}\n",
+        "options": {}
+      },
+      "id": "1936cb3b-1813-4231-8288-fefc9c166b71",
+      "name": "Sales Forecast",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        224,
+        -16
+      ],
+      "executeOnce": true,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://enhance-twice-excess.ngrok-free.dev/api/segmentation/rfm?clusters=3",
+        "options": {}
+      },
+      "id": "47141bfc-f533-469e-80b7-665b2cf7f2d5",
+      "name": "Client Segmentation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        448,
+        -16
+      ],
+      "executeOnce": true,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://enhance-twice-excess.ngrok-free.dev/api/anomaly/detect?model=isolation_forest&contamination=0.05",
+        "options": {}
+      },
+      "id": "f3495d1e-3ca9-48e9-ae49-4e6898e5c34a",
+      "name": "Anomaly Detection",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        672,
+        -16
+      ],
+      "executeOnce": true,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://enhance-twice-excess.ngrok-free.dev/api/promotion/predict",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\"Content-Type\": \"application/json\"}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"model\": \"random_forest\",\n  \"unit_price\": 50.0,\n  \"discount_rate\": 0.1,\n  \"day\": 3,\n  \"month\": 6,\n  \"is_weekend\": 0\n}",
+        "options": {}
+      },
+      "id": "23834ad5-35bb-47a5-9ac2-84633f920ad8",
+      "name": "Promotion Prediction",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        896,
+        -16
+      ],
+      "executeOnce": true,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://enhance-twice-excess.ngrok-free.dev/api/recommendations/clients",
+        "options": {}
+      },
+      "id": "b75691e1-9b53-4dca-9828-fdc9a2e7db41",
+      "name": "Client Recommendations",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1120,
+        -16
+      ],
+      "executeOnce": true,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://enhance-twice-excess.ngrok-free.dev/api/sentiment/train",
+        "options": {}
+      },
+      "id": "fca91afb-7898-460f-bd3e-d6000395a5a7",
+      "name": "Sentiment Analysis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1344,
+        -16
+      ],
+      "executeOnce": true,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "sendTo": "raninbakouri8@gmail.com",
+        "subject": "ML Workflow Success",
+        "message": "=n8n automation flow worked successfully\n\nLocal ML Model Result:\n{{ $('Prepare ML Result').item.json.result }}\n\nTimestamp: {{ $('Prepare ML Result').item.json.timestamp }}",
+        "options": {}
+      },
+      "id": "682e4d6a-90fc-41ef-ba6b-84a1fe46e3b8",
+      "name": "Send Success Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1344,
+        176
+      ],
+      "webhookId": "6a891db9-982d-4b3b-bc20-cab41baad481",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "KTy0fgohelgSlhcS",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "190ca3b1-7fa0-42df-b292-15f9ab50e7da",
+      "name": "Combine All Results",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1568,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "model",
+              "value": "={{ $json.model }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "steps",
+              "value": 4,
+              "type": "number"
+            },
+            {
+              "id": "3",
+              "name": "result",
+              "value": "={{ JSON.stringify($json) }}",
+              "type": "string"
+            },
+            {
+              "id": "4",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7e656ae3-0bd9-43b6-b862-ad6038f7380f",
+      "name": "Prepare ML Result",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "summary",
+              "value": "=All ML models executed successfully at {{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "results_count",
+              "value": "={{ $input.all().length }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5d66ce94-75aa-4503-a308-11171ba7a875",
+      "name": "Prepare Summary",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1792,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "raninbakouri8@gmail.com",
+        "subject": "ML Pipeline Execution Summary",
+        "message": "={{ $('Prepare Summary').item.json.summary }}\\n\\nTotal results: {{ $('Prepare Summary').item.json.results_count }}",
+        "options": {}
+      },
+      "id": "a7a6c06d-2b91-4c9f-9fd5-2b6e1e1e8336",
+      "name": "Send Summary Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2496,
+        64
+      ],
+      "webhookId": "6dfacc16-e2a9-4ccc-a4b7-d49f06eeda70",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "KTy0fgohelgSlhcS",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "e8b2b6e8-6978-442d-a4bd-e85c9b1f4036",
+      "name": "On Workflow Error",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        864
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "raninbakouri8@gmail.com",
+        "subject": "ML Workflow Error Alert",
+        "message": "=ML workflow failed:\\n\\nError: {{ $json.error.message }}\\n\\nWorkflow: {{ $workflow.name }}\\nExecution ID: {{ $execution.id }}",
+        "options": {}
+      },
+      "id": "4ecf6fb1-9130-427c-a05c-f92131b719cf",
+      "name": "Send Error Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1488,
+        832
+      ],
+      "webhookId": "688704dc-4efa-4e6f-a344-4d8f31b08ece",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "KTy0fgohelgSlhcS",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://enhance-twice-excess.ngrok-free.dev/api/model/predict",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\"Content-Type\": \"application/json\"}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"model\": \"data\"\n}\n",
+        "options": {}
+      },
+      "id": "986a1b65-c4b8-4bbb-8bf0-def1e75daf73",
+      "name": "Run Local ML Model",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        0,
+        176
+      ],
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://enhance-twice-excess.ngrok-free.dev/api/insert",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model_name\": \"{{ $json.model }}\",\n  \"result\": {{ JSON.stringify($json) }}\n}",
+        "options": {}
+      },
+      "id": "7e86aad2-df03-4f21-83b6-9cb9a75aa6b5",
+      "name": "Store Predictions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        544,
+        176
+      ],
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://enhance-twice-excess.ngrok-free.dev/api/insert",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model_name\": \"{{ $json.summary ? 'pipeline_summary' : ($json.model || 'unknown') }}\",\n  \"result\": \"{{ $json.summary || JSON.stringify($json) }}\"\n}\n",
+        "options": {}
+      },
+      "id": "99680d4c-2caa-406a-b786-fce145bead8b",
+      "name": "Store Predictions1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2000,
+        96
+      ],
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://enhance-twice-excess.ngrok-free.dev/api/log",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"workflow\": \"ML Pipeline\",\n  \"status\": \"success\",\n  \"details\": \"Pipeline executed successfully\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2288,
+        96
+      ],
+      "id": "f80e5cbd-390c-450c-a6c1-24823e64e7e1",
+      "name": "Log "
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 2 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -272,
+        704
+      ],
+      "id": "b0fdc762-1c5f-4089-a7b0-0925ab17f85b",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "sendTo": "raninbakouri8@gmail.com",
+        "subject": "ML Workflow retrainning models",
+        "message": "=ML workflow failed:\\n\\nError: {{ $json.error.message }}\\n\\nWorkflow: {{ $workflow.name }}\\nExecution ID: {{ $execution.id }}",
+        "options": {}
+      },
+      "id": "c4b6a39c-d811-4b91-b32e-ff5edb116ddd",
+      "name": "Send retraining Email1",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        352,
+        656
+      ],
+      "webhookId": "688704dc-4efa-4e6f-a344-4d8f31b08ece",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "KTy0fgohelgSlhcS",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ml-pipeline",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -304,
+        352
+      ],
+      "id": "ad5b8055-be53-4d30-9b2f-be8256c839b6",
+      "name": "Webhook",
+      "webhookId": "8cfd1025-2b1b-44a6-b89a-0a58d284d83d"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://enhance-twice-excess.ngrok-free.dev/api/retrain",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"model\": \"sentiment\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        80,
+        640
+      ],
+      "id": "2bfd95dc-5e37-42a8-86e4-437f2d6b969a",
+      "name": "retraining model"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "name": "First item",
+          "code": 1
+        }
+      },
+      {
+        "json": {
+          "name": "Second item",
+          "code": 2
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Run Local ML Model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Data": {
+      "main": [
+        [
+          {
+            "node": "Sales Forecast",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sales Forecast": {
+      "main": [
+        [
+          {
+            "node": "Client Segmentation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Client Segmentation": {
+      "main": [
+        [
+          {
+            "node": "Anomaly Detection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anomaly Detection": {
+      "main": [
+        [
+          {
+            "node": "Promotion Prediction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Promotion Prediction": {
+      "main": [
+        [
+          {
+            "node": "Client Recommendations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Client Recommendations": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analysis": {
+      "main": [
+        [
+          {
+            "node": "Combine All Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine All Results": {
+      "main": [
+        [
+          {
+            "node": "Prepare Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare ML Result": {
+      "main": [
+        [
+          {
+            "node": "Store Predictions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Success Email": {
+      "main": [
+        [
+          {
+            "node": "Combine All Results",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Prepare Summary": {
+      "main": [
+        [
+          {
+            "node": "Store Predictions1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On Workflow Error": {
+      "main": [
+        [
+          {
+            "node": "Send Error Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Error Email": {
+      "main": [
+        []
+      ]
+    },
+    "Run Local ML Model": {
+      "main": [
+        [
+          {
+            "node": "Prepare ML Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Predictions": {
+      "main": [
+        [
+          {
+            "node": "Send Success Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Predictions1": {
+      "main": [
+        [
+          {
+            "node": "Log ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log ": {
+      "main": [
+        [
+          {
+            "node": "Send Summary Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "retraining model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Run Local ML Model",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "retraining model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "retraining model": {
+      "main": [
+        [
+          {
+            "node": "Send retraining Email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "639ddaba-946e-4d5c-bbfd-ffd150857663",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "80d59de92cb3d2d56af2303ff2ac869c821f7a86a2fe1ce286f47e1434c651d1"
+  },
+  "id": "seCNrhCK4LSlCrTv",
+  "tags": []
+}

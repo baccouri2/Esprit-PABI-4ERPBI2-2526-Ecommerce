@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sougui Analytics - Marketing Flyer Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            padding: 40px;
+            color: white;
+        }
+
+        .controls {
+            max-width: 800px;
+            margin: 0 auto 40px;
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #60a5fa;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        .preview {
+            max-width: 100%;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .preview img {
+            max-width: 600px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .dimension-label {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #60a5fa;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h1>📄 Sougui Analytics Flyer Generator</h1>
+        <p style="color: #94a3b8; margin-bottom: 20px;">Generate professional marketing flyers in exact dimensions</p>
+        
+        <div class="button-group">
+            <button onclick="generateFlyer(1748, 2480)">
+                📋 Generate 1748 x 2480
+            </button>
+            <button onclick="generateFlyer(2480, 3508)">
+                📋 Generate 2480 x 3508
+            </button>
+        </div>
+
+        <div class="info">
+            ✨ Click a button to generate and download the marketing flyer in exact dimensions!
+        </div>
+    </div>
+
+    <div class="preview" id="preview"></div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        function generateFlyer(width, height) {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set exact dimensions
+            canvas.width = width;
+            canvas.height = height;
+
+            // Scale factor
+            const scale = width / 1748;
+
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, width, height);
+            gradient.addColorStop(0, '#0f1923');
+            gradient.addColorStop(0.3, '#1a2942');
+            gradient.addColorStop(0.7, '#2d3e5f');
+            gradient.addColorStop(1, '#1a2942');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            // Grid pattern
+            ctx.strokeStyle = 'rgba(59, 130, 246, 0.05)';
+            ctx.lineWidth = 1;
+            const gridSize = 60 * scale;
+            for (let x = 0; x < width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+            }
+            for (let y = 0; y < height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+
+            // Decorative elements
+            ctx.strokeStyle = 'rgba(59, 130, 246, 0.15)';
+            ctx.lineWidth = 3 * scale;
+            ctx.beginPath();
+            ctx.arc(width - 300 * scale, 200 * scale, 400 * scale, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(200 * scale, height - 300 * scale, 350 * scale, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Top section - Logo and Title
+            const logoSize = 280 * scale;
+            const logoX = width / 2 - logoSize / 2;
+            const logoY = 200 * scale;
+            
+            const logoGradient = ctx.createLinearGradient(logoX, logoY, logoX + logoSize, logoY + logoSize);
+            logoGradient.addColorStop(0, '#3b82f6');
+            logoGradient.addColorStop(1, '#8b5cf6');
+            ctx.fillStyle = logoGradient;
+            ctx.shadowColor = 'rgba(59, 130, 246, 0.6)';
+            ctx.shadowBlur = 40 * scale;
+            roundRect(ctx, logoX, logoY, logoSize, logoSize, 50 * scale);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Logo text "S"
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${140 * scale}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('S', width / 2, logoY + logoSize / 2);
+
+            // Company name
+            const titleY = logoY + logoSize + 120 * scale;
+            ctx.font = `900 ${120 * scale}px Arial`;
+            ctx.fillStyle = 'white';
+            ctx.fillText('Sougui', width / 2 - 200 * scale, titleY);
+
+            const analyticsGradient = ctx.createLinearGradient(
+                width / 2, titleY - 60 * scale,
+                width / 2 + 500 * scale, titleY + 60 * scale
+            );
+            analyticsGradient.addColorStop(0, '#60a5fa');
+            analyticsGradient.addColorStop(0.5, '#a78bfa');
+            analyticsGradient.addColorStop(1, '#f472b6');
+            ctx.fillStyle = analyticsGradient;
+            ctx.fillText('Analytics', width / 2 + 300 * scale, titleY);
+
+            // Tagline
+            ctx.font = `300 ${45 * scale}px Arial`;
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText('AI-Powered Business Intelligence Platform', width / 2, titleY + 100 * scale);
+
+            // Features section
+            const featuresY = titleY + 250 * scale;
+            const features = [
+                { icon: '📊', title: 'Real-Time Analytics', desc: 'Monitor your business metrics in real-time' },
+                { icon: '🤖', title: 'AI Assistant', desc: 'Get intelligent insights and recommendations' },
+                { icon: '🔮', title: 'Predictive Forecasting', desc: 'Anticipate trends with machine learning' },
+                { icon: '👥', title: 'CRM Integration', desc: 'Seamless Odoo CRM integration' },
+                { icon: '🎯', title: 'Smart Recommendations', desc: 'Data-driven business strategies' },
+                { icon: '🔐', title: 'Face ID Security', desc: 'Advanced biometric authentication' }
+            ];
+
+            const featureBoxWidth = width * 0.85;
+            const featureBoxX = (width - featureBoxWidth) / 2;
+            let currentY = featuresY;
+
+            features.forEach((feature, index) => {
+                // Feature box
+                ctx.fillStyle = 'rgba(59, 130, 246, 0.1)';
+                ctx.strokeStyle = 'rgba(59, 130, 246, 0.3)';
+                ctx.lineWidth = 2 * scale;
+                roundRect(ctx, featureBoxX, currentY, featureBoxWidth, 140 * scale, 20 * scale);
+                ctx.fill();
+                ctx.stroke();
+
+                // Icon
+                ctx.font = `${60 * scale}px Arial`;
+                ctx.fillText(feature.icon, featureBoxX + 80 * scale, currentY + 70 * scale);
+
+                // Title
+                ctx.font = `bold ${40 * scale}px Arial`;
+                ctx.fillStyle = 'white';
+                ctx.textAlign = 'left';
+                ctx.fillText(feature.title, featureBoxX + 180 * scale, currentY + 50 * scale);
+
+                // Description
+                ctx.font = `300 ${30 * scale}px Arial`;
+                ctx.fillStyle = '#94a3b8';
+                ctx.fillText(feature.desc, featureBoxX + 180 * scale, currentY + 95 * scale);
+
+                currentY += 160 * scale;
+            });
+
+            // Bottom CTA section
+            const ctaY = height - 350 * scale;
+            
+            // CTA box
+            const ctaGradient = ctx.createLinearGradient(0, ctaY, width, ctaY + 200 * scale);
+            ctaGradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
+            ctaGradient.addColorStop(1, 'rgba(139, 92, 246, 0.2)');
+            ctx.fillStyle = ctaGradient;
+            roundRect(ctx, width * 0.1, ctaY, width * 0.8, 200 * scale, 30 * scale);
+            ctx.fill();
+
+            ctx.strokeStyle = 'rgba(59, 130, 246, 0.5)';
+            ctx.lineWidth = 3 * scale;
+            ctx.stroke();
+
+            // CTA text
+            ctx.font = `bold ${55 * scale}px Arial`;
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.fillText('Transform Your Business Today', width / 2, ctaY + 70 * scale);
+
+            ctx.font = `300 ${35 * scale}px Arial`;
+            ctx.fillStyle = '#60a5fa';
+            ctx.fillText('www.sougui-analytics.com', width / 2, ctaY + 130 * scale);
+
+            // Footer
+            ctx.font = `300 ${28 * scale}px Arial`;
+            ctx.fillStyle = '#64748b';
+            ctx.fillText('© 2026 Sougui Analytics. All rights reserved.', width / 2, height - 80 * scale);
+
+            // Convert to image and download
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `sougui-analytics-flyer-${width}x${height}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                // Show preview
+                const preview = document.getElementById('preview');
+                preview.innerHTML = `
+                    <div class="dimension-label">✅ Downloaded: ${width} x ${height} pixels</div>
+                    <img src="${url}" alt="Preview">
+                `;
+            });
+        }
+
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+    </script>
+</body>
+</html>

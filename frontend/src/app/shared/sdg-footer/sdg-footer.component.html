@@ -1,0 +1,14 @@
+<div class="sdg-footer">
+  <div class="sdg-content">
+    <div class="sdg-badge" [style.background-color]="currentSDG.color + '20'" [style.border-color]="currentSDG.color + '50'">
+      <div class="sdg-number" [style.color]="currentSDG.color">
+        {{ currentSDG.number }}
+      </div>
+      <div class="sdg-emoji">{{ currentSDG.icon }}</div>
+    </div>
+    <div class="sdg-text">
+      <strong [style.color]="currentSDG.color">SDG {{ currentSDG.number }}: {{ currentSDG.title }}</strong>
+      <p>{{ displayDescription }}</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,132 @@
+[
+  {
+    "timestamp": "2026-04-16 12:57:54",
+    "workflow": "ML Pipeline",
+    "status": "success",
+    "details": "Pipeline executed successfully"
+  },
+  {
+    "timestamp": "2026-04-16 12:57:54",
+    "workflow": "ML Pipeline",
+    "status": "success",
+    "details": "Pipeline executed successfully"
+  },
+  {
+    "timestamp": "2026-04-16 13:28:10",
+    "workflow": "ML Pipeline",
+    "status": "success",
+    "details": "Pipeline executed successfully"
+  },
+  {
+    "timestamp": "2026-04-16 13:31:25",
+    "workflow": "ML Pipeline",
+    "status": "success",
+    "details": "Pipeline executed successfully"
+  },
+  {
+    "timestamp": "2026-04-16 13:31:25",
+    "workflow": "ML Pipeline",
+    "status": "success",
+    "details": "Pipeline executed successfully"
+  },
+  {
+    "timestamp": "2026-04-16 13:31:25",
+    "workflow": "ML Pipeline",
+    "status": "success",
+    "details": "Pipeline executed successfully"
+  },
+  {
+    "timestamp": "2026-04-16 13:33:31",
+    "workflow": "ML Pipeline",
+    "status": "success",
+    "details": "Pipeline executed successfully"
+  },
+  {
+    "timestamp": "2026-04-16 13:33:31",
+    "workflow": "ML Pipeline",
+    "status": "success",
+    "details": "Pipeline executed successfully"
+  },
+  {
+    "timestamp": "2026-04-16 13:33:31",
+    "workflow": "ML Pipeline",
+    "status": "success",
+    "details": "Pipeline executed successfully"
+  },
+  {
+    "timestamp": "2026-04-16 13:36:52",
+    "workflow": "ML Pipeline",
+    "status": "success",
+    "details": "Pipeline executed successfully"
+  },
+  {
+    "timestamp": "2026-04-16 13:36:52",
+    "workflow": "ML Pipeline",
+    "status": "success",
+    "details": "Pipeline executed successfully"
+  },
+  {
+    "timestamp": "2026-04-16 13:36:54",
+    "level": "INFO",
+    "workflow": "Flask Backend",
+    "status": "info",
+    "details": "Sentiment retrained — accuracy: 100.0%, version: 2"
+  },
+  {
+    "timestamp": "2026-04-16 13:36:55",
+    "level": "INFO",
+    "workflow": "Flask Backend",
+    "status": "info",
+    "details": "Sentiment retrained — accuracy: 100.0%, version: 3"
+  },
+  {
+    "timestamp": "2026-04-16 13:40:49",
+    "workflow": "ML Pipeline",
+    "status": "success",
+    "details": "Pipeline executed successfully"
+  },
+  {
+    "timestamp": "2026-04-16 13:40:49",
+    "workflow": "ML Pipeline",
+    "status": "success",
+    "details": "Pipeline executed successfully"
+  },
+  {
+    "timestamp": "2026-04-16 13:40:51",
+    "level": "INFO",
+    "workflow": "Flask Backend",
+    "status": "info",
+    "details": "Sentiment retrained — accuracy: 100.0%, version: 4"
+  },
+  {
+    "timestamp": "2026-04-16 13:41:37",
+    "workflow": "ML Pipeline",
+    "status": "success",
+    "details": "Pipeline executed successfully"
+  },
+  {
+    "timestamp": "2026-04-16 13:41:37",
+    "workflow": "ML Pipeline",
+    "status": "success",
+    "details": "Pipeline executed successfully"
+  },
+  {
+    "timestamp": "2026-04-16 13:45:58",
+    "workflow": "ML Pipeline",
+    "status": "success",
+    "details": "Pipeline executed successfully"
+  },
+  {
+    "timestamp": "2026-04-16 13:45:58",
+    "workflow": "ML Pipeline",
+    "status": "success",
+    "details": "Pipeline executed successfully"
+  },
+  {
+    "timestamp": "2026-04-23 12:01:18",
+    "level": "INFO",
+    "workflow": "Flask Backend",
+    "status": "info",
+    "details": "Health check called"
+  }
+]

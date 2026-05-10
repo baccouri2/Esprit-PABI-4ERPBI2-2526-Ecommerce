@@ -1,0 +1,155 @@
+<!-- Banners -->
+<div class="banner success" *ngIf="success">✅ {{ success }}</div>
+<div class="banner error"   *ngIf="error && !loading">⚠️ {{ error }}</div>
+
+<!-- Header -->
+<div class="page-header fade-in">
+  <div class="page-title-row">
+    <span class="page-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="1" y="3" width="15" height="13" rx="2"/>
+        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+        <circle cx="5.5" cy="18.5" r="2.5"/>
+        <circle cx="18.5" cy="18.5" r="2.5"/>
+      </svg>
+    </span>
+    <h1>{{ translate.translate('suppliers.title') }}</h1>
+  </div>
+  <p class="subtitle">{{ translate.translate('suppliers.subtitle') }}</p>
+</div>
+
+<!-- KPI -->
+<div class="kpi-row fade-in">
+  <div class="kpi-card">
+    <div class="kpi-value">{{ suppliers.length }}</div>
+    <div class="kpi-label">{{ translate.translate('suppliers.totalSuppliers') }}</div>
+  </div>
+  <div class="kpi-card active">
+    <div class="kpi-value">{{ withPurchases }}</div>
+    <div class="kpi-label">{{ translate.translate('suppliers.withPurchases') }}</div>
+  </div>
+</div>
+
+<!-- Toolbar -->
+<div class="toolbar fade-in">
+  <div class="search-box">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input type="text" [(ngModel)]="searchQ" (keyup.enter)="onSearch()" [placeholder]="translate.translate('common.search')">
+    <button class="search-btn" (click)="onSearch()">{{ translate.translate('common.search') }}</button>
+  </div>
+
+  <button class="btn-add" (click)="openCreate()" *ngIf="permissions.create">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    {{ translate.translate('suppliers.addSupplier') }}
+  </button>
+</div>
+
+<!-- Table -->
+<div class="card fade-in">
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div><p>{{ translate.translate('common.loading') }}</p>
+  </div>
+
+  <div *ngIf="!loading && suppliers.length === 0" class="empty-state">
+    <p>{{ translate.translate('suppliers.noSuppliers') }}</p>
+  </div>
+
+  <div *ngIf="!loading && suppliers.length > 0" class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>{{ translate.translate('suppliers.table.name') }}</th>
+          <th>{{ translate.translate('suppliers.table.company') }}</th>
+          <th>{{ translate.translate('suppliers.table.paymentMethod') }}</th>
+          <th>{{ translate.translate('suppliers.table.purchases') }}</th>
+          <th>{{ translate.translate('common.actions') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of suppliers">
+          <td><strong>#{{ s.id }}</strong></td>
+          <td><strong>{{ s.name_supplier }}</strong></td>
+          <td>{{ s.company }}</td>
+          <td>
+            <span class="badge" [ngClass]="paymentBadgeClass(s.payment_method)">
+              {{ s.payment_method }}
+            </span>
+          </td>
+          <td><span class="order-badge">{{ s.purchase_count }}</span></td>
+          <td class="actions">
+            <button class="btn-icon edit"   (click)="openEdit(s)"      [title]="translate.translate('common.edit')" *ngIf="permissions.update">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="btn-icon delete" (click)="confirmDelete(s)" [title]="translate.translate('common.delete')" [disabled]="s.purchase_count > 0" *ngIf="permissions.delete">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Create / Edit Modal -->
+<div class="modal-overlay" *ngIf="modalMode" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ modalMode === 'create' ? translate.translate('suppliers.modal.addTitle') : translate.translate('suppliers.modal.editTitle') }}</h3>
+      <button class="modal-close" (click)="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-error" *ngIf="modalError">⚠️ {{ modalError }}</div>
+
+      <div class="form-group">
+        <label>{{ translate.translate('suppliers.modal.supplierName') }} <span class="required">*</span></label>
+        <input type="text" [(ngModel)]="form.name_supplier" [placeholder]="translate.translate('suppliers.modal.supplierNamePlaceholder')">
+      </div>
+      <div class="form-group">
+        <label>{{ translate.translate('suppliers.modal.company') }} <span class="required">*</span></label>
+        <input type="text" [(ngModel)]="form.company" [placeholder]="translate.translate('suppliers.modal.companyPlaceholder')">
+      </div>
+      <div class="form-group">
+        <label>{{ translate.translate('suppliers.modal.paymentMethod') }} <span class="required">*</span></label>
+        <select [(ngModel)]="form.payment_method">
+          <option value="">{{ translate.translate('suppliers.modal.selectPayment') }}</option>
+          <option *ngFor="let m of paymentMethods" [value]="m">{{ m }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">{{ translate.translate('common.cancel') }}</button>
+      <button class="btn-save"   (click)="save()" [disabled]="saving">
+        {{ saving ? translate.translate('suppliers.modal.saving') : (modalMode === 'create' ? translate.translate('common.create') : translate.translate('suppliers.modal.saveChanges')) }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm -->
+<div class="modal-overlay" *ngIf="deleteTarget" (click)="cancelDelete()">
+  <div class="modal modal-sm" (click)="$event.stopPropagation()">
+    <div class="modal-header danger">
+      <h3>{{ translate.translate('suppliers.deleteModal.title') }}</h3>
+      <button class="modal-close" (click)="cancelDelete()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>{{ translate.translate('suppliers.deleteModal.confirmText') }} <strong>{{ deleteTarget.name_supplier }}</strong> ({{ deleteTarget.company }})?</p>
+      <p class="muted">{{ translate.translate('suppliers.deleteModal.warning') }}</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="cancelDelete()">{{ translate.translate('common.cancel') }}</button>
+      <button class="btn-delete" (click)="doDelete()" [disabled]="deleting">
+        {{ deleting ? translate.translate('suppliers.deleteModal.deleting') : translate.translate('common.delete') }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SDG Footer -->
+<app-sdg-footer 
+  [sdgNumber]="17"
+  [customDescription]="'This supplier management system promotes partnerships for the goals by enabling effective collaboration with suppliers and fostering sustainable business relationships.'">
+</app-sdg-footer>

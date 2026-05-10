@@ -1,0 +1,57 @@
+# Dossier cache Power BI - à ne JAMAIS commit
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+**/.pbi/*.lock
+
+# Python virtual environments
+venv/
+venv_*/
+backend/venv/
+backend/venv_*/
+env/
+ENV/
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Node modules
+node_modules/
+frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Large model files
+*.pkl
+*.joblib
+*.h5
+*.pb
+*.onnx
+models/
+*.model
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Fichiers temporaires
+*.tmp
+*.bak
+*.log
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+*.egg-info/

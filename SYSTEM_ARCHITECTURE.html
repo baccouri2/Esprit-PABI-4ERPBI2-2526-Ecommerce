@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sougui Analytics - System Architecture</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f1923, #1a2942);
+            padding: 40px;
+            color: white;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 18px;
+        }
+
+        .architecture {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .layer {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(96, 165, 250, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .layer-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #60a5fa;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(96, 165, 250, 0.3);
+        }
+
+        .component {
+            background: rgba(96, 165, 250, 0.1);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .component:hover {
+            background: rgba(96, 165, 250, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(96, 165, 250, 0.3);
+        }
+
+        .component-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .component-tech {
+            font-size: 13px;
+            color: #a78bfa;
+            margin-bottom: 5px;
+        }
+
+        .component-desc {
+            font-size: 12px;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
+
+        .flow-diagram {
+            max-width: 1400px;
+            margin: 40px auto;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(244, 114, 182, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .flow-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #f472b6;
+            text-align: center;
+        }
+
+        .flow-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .flow-step {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(244, 114, 182, 0.1);
+            border: 1px solid rgba(244, 114, 182, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .flow-step::after {
+            content: '→';
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: #f472b6;
+        }
+
+        .flow-step:last-child::after {
+            content: '';
+        }
+
+        .flow-step-number {
+            background: linear-gradient(135deg, #f472b6, #a78bfa);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .flow-step-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .flow-step-desc {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .tech-stack {
+            max-width: 1400px;
+            margin: 40px auto;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .tech-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #a78bfa;
+            text-align: center;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .tech-category {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .tech-category-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #a78bfa;
+        }
+
+        .tech-list {
+            list-style: none;
+        }
+
+        .tech-list li {
+            padding: 8px 0;
+            color: #cbd5e1;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+        }
+
+        .tech-list li:last-child {
+            border-bottom: none;
+        }
+
+        .download-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(59, 130, 246, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 1024px) {
+            .architecture {
+                grid-template-columns: 1fr;
+            }
+            
+            .flow-steps {
+                flex-direction: column;
+            }
+            
+            .flow-step::after {
+                content: '↓';
+                right: 50%;
+                top: auto;
+                bottom: -30px;
+                transform: translateX(50%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏗️ Sougui Analytics System Architecture</h1>
+        <p class="subtitle">AI-Powered Business Intelligence Platform</p>
+    </div>
+
+    <div class="architecture">
+        <!-- Frontend Layer -->
+        <div class="layer">
+            <div class="layer-title">🎨 Frontend Layer</div>
+            
+            <div class="component">
+                <div class="component-name">Angular Application</div>
+                <div class="component-tech">Angular 18 + TypeScript</div>
+                <div class="component-desc">Modern SPA with reactive components and routing</div>
+            </div>
+
+            <div class="component">
+                <div class="component-name">Dashboard Module</div>
+                <div class="component-tech">Chart.js + ApexCharts</div>
+                <div class="component-desc">Real-time analytics visualization with interactive charts</div>
+            </div>
+
+            <div class="component">
+                <div class="component-name">AI Assistant</div>
+                <div class="component-tech">WebSocket + Markdown</div>
+                <div class="component-desc">Conversational AI interface with real-time responses</div>
+            </div>
+
+            <div class="component">
+                <div class="component-name">CRM Integration</div>
+                <div class="component-tech">Odoo RPC</div>
+                <div class="component-desc">Seamless Odoo CRM data management</div>
+            </div>
+
+            <div class="component">
+                <div class="component-name">Face ID Auth</div>
+                <div class="component-tech">face-api.js + TensorFlow.js</div>
+                <div class="component-desc">Biometric authentication with facial recognition</div>
+            </div>
+
+            <div class="component">
+                <div class="component-name">Translation Service</div>
+                <div class="component-tech">i18n</div>
+                <div class="component-desc">Multi-language support (EN/FR)</div>
+            </div>
+        </div>
+
+        <!-- Backend Layer -->
+        <div class="layer">
+            <div class="layer-title">⚙️ Backend Layer</div>
+            
+            <div class="component">
+                <div class="component-name">Flask API Server</div>
+                <div class="component-tech">Python Flask + CORS</div>
+                <div class="component-desc">RESTful API with microservices architecture</div>
+            </div>
+
+            <div class="component">
+                <div class="component-name">ML Engine</div>
+                <div class="component-tech">scikit-learn + Prophet</div>
+                <div class="component-desc">Predictive analytics and forecasting models</div>
+            </div>
+
+            <div class="component">
+                <div class="component-name">AI Chatbot</div>
+                <div class="component-tech">Groq LLM API</div>
+                <div class="component-desc">Natural language processing for business insights</div>
+            </div>
+
+            <div class="component">
+                <div class="component-name">Recommendation Engine</div>
+                <div class="component-tech">Collaborative Filtering</div>
+                <div class="component-desc">Smart product and strategy recommendations</div>
+            </div>
+
+            <div class="component">
+                <div class="component-name">Odoo Service</div>
+                <div class="component-tech">OdooRPC</div>
+                <div class="component-desc">CRM data synchronization and management</div>
+            </div>
+
+            <div class="component">
+                <div class="component-name">ETL Pipeline</div>
+                <div class="component-tech">Pandas + NumPy</div>
+                <div class="component-desc">Data extraction, transformation, and loading</div>
+            </div>
+        </div>
+
+        <!-- Data Layer -->
+        <div class="layer">
+            <div class="layer-title">💾 Data Layer</div>
+            
+            <div class="component">
+                <div class="component-name">SQL Server</div>
+                <div class="component-tech">Microsoft SQL Server</div>
+                <div class="component-desc">Primary transactional database for business data</div>
+            </div>
+
+            <div class="component">
+                <div class="component-name">PostgreSQL</div>
+                <div class="component-tech">PostgreSQL 16</div>
+                <div class="component-desc">Odoo CRM database with relational data</div>
+            </div>
+
+            <div class="component">
+                <div class="component-name">ML Models Storage</div>
+                <div class="component-tech">Pickle + Joblib</div>
+                <div class="component-desc">Trained model persistence and versioning</div>
+            </div>
+
+            <div class="component">
+                <div class="component-name">Face Descriptors</div>
+                <div class="component-tech">JSON Storage</div>
+                <div class="component-desc">Facial recognition embeddings database</div>
+            </div>
+
+            <div class="component">
+                <div class="component-name">Cache Layer</div>
+                <div class="component-tech">In-Memory Cache</div>
+                <div class="component-desc">Performance optimization for frequent queries</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flow-diagram">
+        <div class="flow-title">📊 Data Flow Architecture</div>
+        <div class="flow-steps">
+            <div class="flow-step">
+                <div class="flow-step-number">1</div>
+                <div class="flow-step-name">User Request</div>
+                <div class="flow-step-desc">Angular frontend sends API request</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-step-number">2</div>
+                <div class="flow-step-name">API Gateway</div>
+                <div class="flow-step-desc">Flask routes request to appropriate service</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-step-number">3</div>
+                <div class="flow-step-name">Data Processing</div>
+                <div class="flow-step-desc">ETL pipeline processes and transforms data</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-step-number">4</div>
+                <div class="flow-step-name">ML Analysis</div>
+                <div class="flow-step-desc">AI models generate predictions and insights</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-step-number">5</div>
+                <div class="flow-step-name">Response</div>
+                <div class="flow-step-desc">JSON data returned to frontend for visualization</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tech-stack">
+        <div class="tech-title">🛠️ Technology Stack</div>
+        <div class="tech-grid">
+            <div class="tech-category">
+                <div class="tech-category-title">Frontend</div>
+                <ul class="tech-list">
+                    <li>Angular 18</li>
+                    <li>TypeScript</li>
+                    <li>RxJS</li>
+                    <li>Chart.js</li>
+                    <li>ApexCharts</li>
+                    <li>face-api.js</li>
+                    <li>TensorFlow.js</li>
+                </ul>
+            </div>
+
+            <div class="tech-category">
+                <div class="tech-category-title">Backend</div>
+                <ul class="tech-list">
+                    <li>Python 3.11</li>
+                    <li>Flask</li>
+                    <li>scikit-learn</li>
+                    <li>Prophet</li>
+                    <li>Pandas</li>
+                    <li>NumPy</li>
+                    <li>Groq API</li>
+                </ul>
+            </div>
+
+            <div class="tech-category">
+                <div class="tech-category-title">Database</div>
+                <ul class="tech-list">
+                    <li>SQL Server</li>
+                    <li>PostgreSQL 16</li>
+                    <li>pyodbc</li>
+                    <li>psycopg2</li>
+                    <li>OdooRPC</li>
+                </ul>
+            </div>
+
+            <div class="tech-category">
+                <div class="tech-category-title">DevOps</div>
+                <ul class="tech-list">
+                    <li>Docker</li>
+                    <li>Docker Compose</li>
+                    <li>Vercel (Frontend)</li>
+                    <li>Render (Backend)</li>
+                    <li>Git</li>
+                </ul>
+            </div>
+
+            <div class="tech-category">
+                <div class="tech-category-title">Security</div>
+                <ul class="tech-list">
+                    <li>Face ID Authentication</li>
+                    <li>JWT Tokens</li>
+                    <li>CORS Protection</li>
+                    <li>HTTPS/SSL</li>
+                    <li>Environment Variables</li>
+                </ul>
+            </div>
+
+            <div class="tech-category">
+                <div class="tech-category-title">Integration</div>
+                <ul class="tech-list">
+                    <li>Odoo CRM</li>
+                    <li>REST APIs</li>
+                    <li>WebSocket</li>
+                    <li>N8N Workflows</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <button class="download-btn" onclick="downloadDiagram()">📥 Download as Image</button>
+
+    <script>
+        function downloadDiagram() {
+            // Create a simple text version for download
+            const content = `
+SOUGUI ANALYTICS - SYSTEM ARCHITECTURE
+=====================================
+
+FRONTEND LAYER:
+- Angular 18 Application
+- Dashboard with Chart.js & ApexCharts
+- AI Assistant (WebSocket + Markdown)
+- CRM Integration (Odoo RPC)
+- Face ID Authentication (face-api.js)
+- Translation Service (i18n EN/FR)
+
+BACKEND LAYER:
+- Flask API Server (Python)
+- ML Engine (scikit-learn + Prophet)
+- AI Chatbot (Groq LLM API)
+- Recommendation Engine
+- Odoo Service (OdooRPC)
+- ETL Pipeline (Pandas + NumPy)
+
+DATA LAYER:
+- SQL Server (Primary Database)
+- PostgreSQL 16 (Odoo CRM)
+- ML Models Storage (Pickle)
+- Face Descriptors (JSON)
+- Cache Layer
+
+DATA FLOW:
+1. User Request → Angular Frontend
+2. API Gateway → Flask Routes
+3. Data Processing → ETL Pipeline
+4. ML Analysis → AI Models
+5. Response → JSON to Frontend
+
+TECHNOLOGY STACK:
+Frontend: Angular 18, TypeScript, RxJS, Chart.js, face-api.js
+Backend: Python 3.11, Flask, scikit-learn, Prophet, Pandas
+Database: SQL Server, PostgreSQL 16, OdooRPC
+DevOps: Docker, Docker Compose, Vercel, Render
+Security: Face ID, JWT, CORS, HTTPS
+Integration: Odoo CRM, REST APIs, WebSocket, N8N
+            `;
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sougui-analytics-architecture.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            alert('📥 Architecture diagram downloaded!\n\nFor a visual PNG/PDF, you can:\n1. Take a screenshot of this page\n2. Use browser "Print to PDF"\n3. Use a screenshot tool');
+        }
+    </script>
+</body>
+</html>

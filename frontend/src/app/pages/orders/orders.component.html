@@ -1,0 +1,275 @@
+<div class="orders-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-title-row">
+      <div class="page-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 2a1 1 0 0 0-1 1v1H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V3a1 1 0 1 0-2 0v1H10V3a1 1 0 0 0-1-1z"/>
+          <path d="M4 10h16"/>
+        </svg>
+      </div>
+      <div>
+        <h1>{{ translate.translate('orders.title') }}</h1>
+        <p class="subtitle">{{ translate.translate('orders.subtitle') }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-message" *ngIf="error">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    {{ error }}
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery" 
+          (keyup.enter)="onSearch()"
+          [placeholder]="translate.translate('orders.searchPlaceholder')"
+        >
+      </div>
+      
+      <select [(ngModel)]="selectedStatus" (change)="onFilterStatus()" class="filter-select">
+        <option value="">{{ translate.translate('orders.allStatuses') }}</option>
+        <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+      </select>
+      
+      <button class="btn-secondary" (click)="clearFilters()">
+        {{ translate.translate('orders.clear') }}
+      </button>
+      
+      <button class="btn-secondary" (click)="loadOrders()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+        </svg>
+        {{ translate.translate('orders.refresh') }}
+      </button>
+    </div>
+
+    <div class="toolbar-right">
+      <button class="btn-primary" (click)="openCreateModal()" *ngIf="permissions.create">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        {{ translate.translate('orders.newOrder') }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>{{ translate.translate('orders.loading') }}</p>
+  </div>
+
+  <!-- Orders Table -->
+  <div class="card" *ngIf="!loading">
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ translate.translate('orders.table.id') }}</th>
+            <th>{{ translate.translate('orders.table.orderNumber') }}</th>
+            <th>{{ translate.translate('orders.table.status') }}</th>
+            <th>{{ translate.translate('orders.table.date') }}</th>
+            <th>{{ translate.translate('orders.table.delivery') }}</th>
+            <th>{{ translate.translate('orders.table.items') }}</th>
+            <th>{{ translate.translate('orders.table.total') }}</th>
+            <th>{{ translate.translate('common.actions') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of filteredOrders">
+            <td class="muted">{{ order.id }}</td>
+            <td><strong>{{ order.id_order }}</strong></td>
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(order.order_status)">
+                {{ order.order_status }}
+              </span>
+            </td>
+            <td>{{ order.date_commande }}</td>
+            <td>
+              <div class="delivery-info">
+                <div *ngIf="order.delivery_company">{{ order.delivery_company }}</div>
+                <small *ngIf="order.delivery_num_bl">{{ order.delivery_num_bl }}</small>
+              </div>
+            </td>
+            <td class="muted">{{ order.item_count || 0 }}</td>
+            <td><strong>{{ order.total_amount?.toFixed(2) || '0.00' }} TND</strong></td>
+            <td>
+              <div class="actions">
+                <button class="btn-icon" (click)="openViewModal(order)" [title]="translate.translate('common.details')">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+                <button class="btn-icon edit" (click)="openEditModal(order)" [title]="translate.translate('common.edit')" *ngIf="permissions.update">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </button>
+                <button class="btn-icon btn-success" (click)="downloadInvoice(order)" [title]="translate.translate('orders.modal.downloadInvoice')">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                </button>
+                <button class="btn-icon delete" (click)="deleteOrder(order)" [title]="translate.translate('common.delete')" *ngIf="permissions.delete">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                  </svg>
+                </button>
+                <span class="view-only-badge" *ngIf="!permissions.update && !permissions.delete">{{ translate.translate('orders.viewOnly') }}</span>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filteredOrders.length === 0">
+            <td colspan="8" class="no-data">{{ translate.translate('orders.noOrders') }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>
+        <span *ngIf="modalMode === 'create'">{{ translate.translate('orders.modal.createTitle') }}</span>
+        <span *ngIf="modalMode === 'edit'">{{ translate.translate('orders.modal.editTitle') }}</span>
+        <span *ngIf="modalMode === 'view'">{{ translate.translate('orders.modal.viewTitle') }}</span>
+      </h3>
+      <button class="close-btn" (click)="closeModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- View Mode -->
+      <div *ngIf="modalMode === 'view' && selectedOrder" class="order-details">
+        <div class="detail-grid">
+          <div class="detail-item">
+            <label>{{ translate.translate('orders.modal.orderId') }}</label>
+            <strong>{{ selectedOrder.id_order }}</strong>
+          </div>
+          <div class="detail-item">
+            <label>{{ translate.translate('orders.modal.status') }}</label>
+            <span class="status-badge" [ngClass]="getStatusClass(selectedOrder.order_status)">
+              {{ selectedOrder.order_status }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <label>{{ translate.translate('orders.modal.date') }}</label>
+            <span>{{ selectedOrder.date_commande }}</span>
+          </div>
+          <div class="detail-item">
+            <label>{{ translate.translate('orders.modal.deliveryCompany') }}</label>
+            <span>{{ selectedOrder.delivery_company || 'N/A' }}</span>
+          </div>
+          <div class="detail-item">
+            <label>{{ translate.translate('orders.modal.deliveryCost') }}</label>
+            <span>{{ selectedOrder.delivery_cost?.toFixed(2) || '0.00' }} TND</span>
+          </div>
+          <div class="detail-item">
+            <label>{{ translate.translate('orders.modal.client') }}</label>
+            <span>{{ selectedOrder.client_name || 'N/A' }}</span>
+          </div>
+        </div>
+
+        <div class="items-section" *ngIf="selectedOrder.items && selectedOrder.items.length > 0">
+          <h3>{{ translate.translate('orders.modal.orderItems') }}</h3>
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>{{ translate.translate('orders.modal.reference') }}</th>
+                <th>{{ translate.translate('orders.modal.description') }}</th>
+                <th>{{ translate.translate('orders.modal.unitPrice') }}</th>
+                <th>{{ translate.translate('orders.modal.quantity') }}</th>
+                <th>{{ translate.translate('orders.modal.total') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of selectedOrder.items">
+                <td>{{ item.reference }}</td>
+                <td>{{ item.description }}</td>
+                <td>{{ item.unit_price.toFixed(2) }} TND</td>
+                <td>{{ item.quantity }}</td>
+                <td><strong>{{ item.total_price.toFixed(2) }} TND</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Create/Edit Mode -->
+      <form *ngIf="modalMode !== 'view'" (ngSubmit)="saveOrder()">
+        <div class="form-group">
+          <label>{{ translate.translate('orders.modal.orderId') }} <span class="required">*</span></label>
+          <input 
+            type="text" 
+            [(ngModel)]="formData.id_order" 
+            name="id_order"
+            [placeholder]="translate.translate('orders.modal.orderIdPlaceholder')"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label>{{ translate.translate('orders.modal.status') }} <span class="required">*</span></label>
+          <select [(ngModel)]="formData.order_status" name="order_status" required>
+            <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>{{ translate.translate('orders.modal.date') }} <span class="required">*</span></label>
+          <input 
+            type="date" 
+            [(ngModel)]="formData.date_commande" 
+            name="date_commande"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label>{{ translate.translate('orders.modal.deliveryId') }}</label>
+          <input 
+            type="number" 
+            [(ngModel)]="formData.fk_delivery" 
+            name="fk_delivery"
+            [placeholder]="translate.translate('orders.modal.deliveryIdPlaceholder')"
+          >
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-actions">
+      <button *ngIf="modalMode === 'view'" class="btn-primary" (click)="downloadInvoice(selectedOrder!)">
+        {{ translate.translate('orders.modal.downloadInvoice') }}
+      </button>
+      <button *ngIf="modalMode !== 'view'" type="button" class="btn-save" (click)="saveOrder()" [disabled]="loading">
+        {{ modalMode === 'create' ? translate.translate('orders.modal.create') : translate.translate('orders.modal.update') }}
+      </button>
+      <button type="button" class="btn-cancel" (click)="closeModal()">
+        {{ modalMode === 'view' ? translate.translate('orders.modal.close') : translate.translate('common.cancel') }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,183 @@
+{
+  "info": {
+    "name": "SOUGUI ESHOP - Order Management API",
+    "description": "Collection complète pour tester l'API de gestion des commandes",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Get Order Statuses",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/orders/statuses",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "orders", "statuses"]
+        },
+        "description": "Récupère la liste des statuts de commande disponibles"
+      }
+    },
+    {
+      "name": "2. List All Orders",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/orders",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "orders"]
+        },
+        "description": "Liste toutes les commandes (458 commandes)"
+      }
+    },
+    {
+      "name": "3. Search Orders",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/orders?q=14148",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "orders"],
+          "query": [
+            {
+              "key": "q",
+              "value": "14148",
+              "description": "Recherche par id_order, num_bl ou company"
+            }
+          ]
+        },
+        "description": "Recherche des commandes par mot-clé"
+      }
+    },
+    {
+      "name": "4. Filter by Status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/orders?status=En cours",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "orders"],
+          "query": [
+            {
+              "key": "status",
+              "value": "En cours",
+              "description": "Filtre par statut"
+            }
+          ]
+        },
+        "description": "Filtre les commandes par statut"
+      }
+    },
+    {
+      "name": "5. Get Order Details",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/orders/917",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "orders", "917"]
+        },
+        "description": "Récupère les détails d'une commande spécifique avec les articles"
+      }
+    },
+    {
+      "name": "6. Create Order",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id_order\": \"TEST-001\",\n  \"order_status\": \"En attente\",\n  \"date_commande\": \"2026-04-23\",\n  \"fk_delivery\": 385\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/orders",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "orders"]
+        },
+        "description": "Crée une nouvelle commande"
+      }
+    },
+    {
+      "name": "7. Update Order",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id_order\": \"14148\",\n  \"order_status\": \"Confirmée\",\n  \"date_commande\": \"2026-01-02\",\n  \"fk_delivery\": 385\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/orders/917",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "orders", "917"]
+        },
+        "description": "Met à jour une commande existante"
+      }
+    },
+    {
+      "name": "8. Download Invoice PDF",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/orders/917/invoice",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "orders", "917", "invoice"]
+        },
+        "description": "Télécharge la facture PDF pour une commande"
+      }
+    },
+    {
+      "name": "9. Delete Order",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/orders/{{order_id}}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "orders", "{{order_id}}"]
+        },
+        "description": "Supprime une commande (seulement si aucune vente associée)"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "order_id",
+      "value": "917",
+      "type": "string"
+    }
+  ]
+}

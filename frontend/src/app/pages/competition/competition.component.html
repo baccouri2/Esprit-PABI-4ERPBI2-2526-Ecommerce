@@ -1,0 +1,210 @@
+<app-advice-popup *ngIf="advice" [advice]="advice" (closed)="advice = null"></app-advice-popup>
+
+<div class="page-header fade-in">
+  <div class="page-title-row">
+    <span class="page-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="1"/>
+        <circle cx="19" cy="12" r="1"/>
+        <circle cx="5" cy="12" r="1"/>
+        <path d="M12 3v6m0 6v6M5 9v6m14-6v6"/>
+      </svg>
+    </span>
+    <h1>{{ translate.translate('assistant.competition.title') }}</h1>
+  </div>
+  <p class="subtitle">{{ translate.translate('assistant.competition.description') }}</p>
+</div>
+
+<!-- Tab Navigation -->
+<div class="tabs fade-in">
+  <button class="tab-button" [class.active]="competitionTab === 'competition'" (click)="competitionTab = 'competition'">
+    {{ translate.translate('assistant.competition.analyze') }}
+  </button>
+  <button class="tab-button" [class.active]="competitionTab === 'international'" (click)="competitionTab = 'international'">
+    {{ translate.translate('assistant.recommendations.title') }}
+  </button>
+</div>
+
+<!-- Market & Competition Tab -->
+<div *ngIf="competitionTab === 'competition'" class="tab-content">
+  <div class="card fade-in">
+    <h3>{{ translate.translate('assistant.competition.title') }}</h3>
+    
+    <div class="controls-grid">
+      <div class="control-group">
+        <label>{{ translate.translate('products.title') }}</label>
+        <input type="number" [(ngModel)]="competitionTopN" min="1" max="50" class="form-control">
+      </div>
+
+      <div class="control-group">
+        <button class="btn-primary" (click)="loadCompetitionRecommendations()" [disabled]="competitionLoading">
+          <span *ngIf="!competitionLoading">{{ translate.translate('common.refresh') }}</span>
+          <span *ngIf="competitionLoading">{{ translate.translate('common.loading') }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="competitionRecommendations.length > 0" class="card fade-in">
+    <h3>{{ translate.translate('assistant.recommendations.recommendedProducts') }}</h3>
+    
+    <div class="competition-grid">
+      <div *ngFor="let item of competitionRecommendations" class="competition-card">
+        <div class="card-header">
+          <h4>{{ item.name }}</h4>
+          <span class="category-badge">{{ item.category }}</span>
+        </div>
+        
+        <div class="card-body">
+          <div class="price-section">
+            <span class="label">{{ translate.translate('products.price') }}:</span>
+            <span class="value">{{ item.price | number:'1.2-2' }} DT</span>
+          </div>
+          
+          <div class="probability-section">
+            <span class="label">{{ translate.translate('crm.probability') }}:</span>
+            <div class="probability-bar">
+              <div class="probability-fill" [style.width.%]="item.probability" [style.backgroundColor]="getProbabilityColor(item.probability)"></div>
+            </div>
+            <span class="probability-value" [style.color]="getProbabilityColor(item.probability)">
+              {{ item.probability }}% - {{ getProbabilityLabel(item.probability) }}
+            </span>
+          </div>
+
+          <div *ngIf="item.description" class="description">
+            {{ item.description }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="competitionLoading" class="card fade-in">
+    <p class="loading-message">{{ translate.translate('common.loading') }}</p>
+  </div>
+
+  <!-- Category Price Analysis -->
+  <div class="card fade-in">
+    <h3>{{ translate.translate('products.category') }}</h3>
+    
+    <div class="controls-grid">
+      <div class="control-group">
+        <label>{{ translate.translate('products.category') }}</label>
+        <select [(ngModel)]="selectedCategory" (change)="getCategoryPrice()" class="form-control" *ngIf="categories.length > 0">
+          <option *ngFor="let cat of categories" [value]="cat.category">{{ cat.category }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div *ngIf="categoryPrice" class="card fade-in result-card">
+      <h4>{{ selectedCategory }} - {{ translate.translate('products.price') }}</h4>
+      
+      <div class="price-analysis-grid">
+        <div class="analysis-item">
+          <div class="analysis-label">{{ translate.translate('products.price') }}</div>
+          <div class="analysis-value">{{ categoryPrice.avg_price | number:'1.2-2' }} DT</div>
+        </div>
+
+        <div class="analysis-item">
+          <div class="analysis-label">{{ translate.translate('products.price') }} Min</div>
+          <div class="analysis-value">{{ categoryPrice.min_price | number:'1.2-2' }} DT</div>
+        </div>
+
+        <div class="analysis-item">
+          <div class="analysis-label">{{ translate.translate('products.price') }} Max</div>
+          <div class="analysis-value">{{ categoryPrice.max_price | number:'1.2-2' }} DT</div>
+        </div>
+
+        <div class="analysis-item">
+          <div class="analysis-label">{{ translate.translate('products.title') }}</div>
+          <div class="analysis-value">{{ categoryPrice.count }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="categoryLoading" class="loading-message">{{ translate.translate('common.loading') }}</div>
+  </div>
+</div>
+
+<!-- Customer Recommendations Tab -->
+<div *ngIf="competitionTab === 'international'" class="tab-content">
+  <div class="card fade-in">
+    <h3>{{ translate.translate('assistant.recommendations.title') }}</h3>
+    
+    <div class="form-grid">
+      <div class="control-group">
+        <label>{{ translate.translate('assistant.recommendations.selectClient') }}</label>
+        <select [(ngModel)]="selectedClientId" class="form-control" *ngIf="clients.length > 0">
+          <option *ngFor="let client of clients" [value]="client.client_id">
+            {{ client.client_name || 'Client #' + client.client_id }}
+          </option>
+        </select>
+        <p *ngIf="clients.length === 0" class="info-text">{{ translate.translate('common.loading') }}</p>
+      </div>
+
+      <div class="control-group">
+        <label>{{ translate.translate('assistant.recommendations.score') }}</label>
+        <input type="number" [(ngModel)]="topN" min="1" max="20" class="form-control">
+      </div>
+
+      <div class="control-group">
+        <button class="btn-primary" (click)="getRecommendations()" [disabled]="loadingRecs">
+          <span *ngIf="!loadingRecs">{{ translate.translate('assistant.recommendations.getRecommendations') }}</span>
+          <span *ngIf="loadingRecs">{{ translate.translate('assistant.forecast.analyzing') }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="error" class="error-message">{{ error }}</div>
+  </div>
+
+  <div *ngIf="result" class="card fade-in">
+    <h3>{{ translate.translate('assistant.recommendations.recommendedProducts') }} {{ result.client_name }}</h3>
+    
+    <div *ngIf="result.recommendations && result.recommendations.length > 0" class="recommendations-container">
+      <div *ngFor="let rec of result.recommendations; let i = index" class="recommendation-item">
+        <div class="rec-rank">{{ i + 1 }}</div>
+        
+        <div class="rec-content">
+          <h4>{{ rec.name }}</h4>
+          <div class="rec-details">
+            <span class="detail-item">
+              <strong>{{ translate.translate('products.category') }}:</strong> {{ rec.category }}
+            </span>
+            <span class="detail-item">
+              <strong>{{ translate.translate('products.price') }}:</strong> {{ rec.price | number:'1.2-2' }} DT
+            </span>
+          </div>
+        </div>
+
+        <div class="rec-score">
+          <div class="score-bar">
+            <div class="score-fill" [style.width.%]="getScorePercent(rec.score)"></div>
+          </div>
+          <span class="score-percent">{{ getScorePercent(rec.score) | number:'1.0-0' }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!result.recommendations || result.recommendations.length === 0" class="info-box">
+      <p>{{ translate.translate('clients.noClients') }}</p>
+    </div>
+
+    <div *ngIf="result.purchase_history" class="history-section">
+      <h4>{{ translate.translate('orders.title') }} ({{ result.purchase_history.length }})</h4>
+      <div class="history-tags">
+        <span *ngFor="let item of result.purchase_history" class="history-tag">{{ item }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loadingClients" class="card fade-in">
+    <p class="loading-message">{{ translate.translate('common.loading') }}</p>
+  </div>
+</div>
+
+<!-- SDG Footer -->
+<app-sdg-footer 
+  [sdgNumber]="9"
+  [customDescription]="'This competition analysis system promotes industry innovation and infrastructure by enabling data-driven market insights and competitive intelligence for strategic business decisions.'">
+</app-sdg-footer>

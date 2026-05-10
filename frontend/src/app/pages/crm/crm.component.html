@@ -1,0 +1,423 @@
+<div class="crm-container">
+  <!-- Page Header -->
+  <div class="page-header fade-in">
+    <div class="page-title-row">
+      <span class="page-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </span>
+      <div>
+        <h1>{{ translate.translate('crm.title') }}</h1>
+        <p class="subtitle">{{ translate.translate('crm.subtitle') }}</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-create" (click)="openCreatePartnerModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <line x1="12" y1="5" x2="12" y2="11"/>
+          <line x1="9" y1="8" x2="15" y2="8"/>
+        </svg>
+        {{ translate.translate('crm.newCustomer') }}
+      </button>
+      <button class="btn-create" (click)="openCreateLeadModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        {{ translate.translate('crm.newOpportunity') }}
+      </button>
+      <button class="btn-refresh" (click)="refresh()" [disabled]="isLoading">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+        </svg>
+        {{ translate.translate('common.refresh') }}
+      </button>
+      <button class="btn-odoo" (click)="openOdooLocal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+          <polyline points="15 3 21 3 21 9"/>
+          <line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+        Open Odoo
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Summary -->
+  <div class="stats-summary" *ngIf="!isLoading && !error">
+    <div class="stat-card">
+      <div class="stat-icon" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ totalLeads }}</div>
+        <div class="stat-label">Opportunities</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="1" x2="12" y2="23"/>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ formatCurrency(totalRevenue) }}</div>
+        <div class="stat-label">Expected Revenue</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: rgba(139, 92, 246, 0.15); color: #a78bfa;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stageGroups.length }}</div>
+        <div class="stat-label">Stages</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading opportunities...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-banner" *ngIf="error && !isLoading">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <div>
+      <strong>{{ error }}</strong>
+      <p>Make sure Flask backend (port 5000) and Odoo (port 8069) are running.</p>
+    </div>
+  </div>
+
+  <!-- Kanban Board -->
+  <div class="kanban-board" *ngIf="!isLoading && !error && stageGroups.length > 0">
+    <div class="kanban-column" *ngFor="let stage of stageGroups">
+      <!-- Column Header -->
+      <div class="column-header" [style.border-left-color]="getStageColor(stage.name)">
+        <div class="column-title">
+          <h3>{{ stage.name }}</h3>
+          <span class="column-count">{{ stage.count }}</span>
+        </div>
+        <div class="column-revenue">
+          {{ formatCurrency(stage.totalRevenue) }}
+        </div>
+      </div>
+
+      <!-- Column Cards -->
+      <div class="column-cards">
+        <div class="opportunity-card" *ngFor="let lead of stage.leads">
+          <!-- Card Header -->
+          <div class="card-header">
+            <h4 class="card-title">{{ lead.name }}</h4>
+            <span class="card-id">#{{ lead.id }}</span>
+          </div>
+
+          <!-- Card Body -->
+          <div class="card-body">
+            <!-- Customer -->
+            <div class="card-row" *ngIf="lead.partner_id && Array.isArray(lead.partner_id)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span>{{ lead.partner_id[1] }}</span>
+            </div>
+
+            <!-- Salesperson -->
+            <div class="card-row" *ngIf="lead.user_id && Array.isArray(lead.user_id)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              <span>{{ lead.user_id[1] }}</span>
+            </div>
+
+            <!-- Email -->
+            <div class="card-row" *ngIf="lead.email_from">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <span class="text-truncate">{{ lead.email_from }}</span>
+            </div>
+
+            <!-- Phone -->
+            <div class="card-row" *ngIf="lead.phone">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+              <span>{{ lead.phone }}</span>
+            </div>
+          </div>
+
+          <!-- Card Footer -->
+          <div class="card-footer">
+            <div class="revenue-badge">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"/>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+              {{ formatCurrency(lead.expected_revenue) }}
+            </div>
+            <div class="probability-badge" [class]="'probability-' + (lead.probability >= 80 ? 'high' : lead.probability >= 50 ? 'medium' : 'low')">
+              {{ lead.probability }}%
+            </div>
+          </div>
+
+          <!-- Card Actions -->
+          <div class="card-actions">
+            <button class="btn-action btn-edit" (click)="openEditLeadModal(lead)" title="Edit">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+            <button class="btn-action btn-delete" (click)="confirmDeleteLead(lead)" title="Delete">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                <line x1="10" y1="11" x2="10" y2="17"/>
+                <line x1="14" y1="11" x2="14" y2="17"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-column" *ngIf="stage.leads.length === 0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <p>No opportunities</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State (no opportunities at all) -->
+  <div class="empty-state" *ngIf="!isLoading && !error && stageGroups.length === 0">
+    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+    <h3>No opportunities</h3>
+    <p>Create your first opportunity in Odoo to get started.</p>
+    <button class="btn-primary" (click)="openOdooLocal()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+        <polyline points="15 3 21 3 21 9"/>
+        <line x1="10" y1="14" x2="21" y2="3"/>
+      </svg>
+      Open Odoo
+    </button>
+  </div>
+
+  <!-- Info Banner -->
+  <div class="info-banner" *ngIf="!isLoading && !error">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="16" x2="12" y2="12"/>
+      <line x1="12" y1="8" x2="12.01" y2="8"/>
+    </svg>
+    <div>
+      <strong>Native opportunities view</strong>
+      <p>Data is synchronized with Odoo via API. To edit opportunities, click "Open Odoo".</p>
+    </div>
+  </div>
+
+  <!-- SDG Footer -->
+  <app-sdg-footer 
+    [sdgNumber]="8"
+    [customDescription]="'This CRM system promotes economic growth by enabling efficient sales management, creating opportunities for business development and sustainable economic prosperity.'">
+  </app-sdg-footer>
+
+  <!-- Modal: Create/Edit Opportunity -->
+  <div class="modal-overlay" *ngIf="showLeadModal" (click)="closeLeadModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ isEditMode ? 'Edit' : 'New' }} Opportunity</h2>
+        <button class="btn-close" (click)="closeLeadModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Opportunity Name *</label>
+          <input type="text" [(ngModel)]="currentLead.name" placeholder="Ex: Data Science Training" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Expected Revenue (TND)</label>
+            <input type="number" [(ngModel)]="currentLead.expected_revenue" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label>Probability (%)</label>
+            <input type="number" [(ngModel)]="currentLead.probability" min="0" max="100" placeholder="50">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Customer</label>
+            <select [(ngModel)]="currentLead.partner_id">
+              <option [ngValue]="undefined">-- Select a customer --</option>
+              <option *ngFor="let partner of partners" [ngValue]="partner.id">{{ partner.name }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Stage</label>
+            <select [(ngModel)]="currentLead.stage_id">
+              <option [ngValue]="undefined">-- Select a stage --</option>
+              <option *ngFor="let stage of stages" [ngValue]="stage.id">{{ stage.name }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Salesperson</label>
+          <select [(ngModel)]="currentLead.user_id">
+            <option [ngValue]="undefined">-- Select a salesperson --</option>
+            <option *ngFor="let user of users" [ngValue]="user.id">{{ user.name }}</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" [(ngModel)]="currentLead.email_from" placeholder="contact@example.com">
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" [(ngModel)]="currentLead.phone" placeholder="+216 12 345 678">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Deadline</label>
+          <input type="date" [(ngModel)]="currentLead.date_deadline">
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea [(ngModel)]="currentLead.description" rows="4" placeholder="Opportunity details..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeLeadModal()">Cancel</button>
+        <button class="btn-primary" (click)="saveLead()">{{ isEditMode ? 'Update' : 'Create' }}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Create Customer -->
+  <div class="modal-overlay" *ngIf="showPartnerModal" (click)="closePartnerModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>New Customer</h2>
+        <button class="btn-close" (click)="closePartnerModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Customer Name *</label>
+          <input type="text" [(ngModel)]="currentPartner.name" placeholder="Ex: ESPRIT" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" [(ngModel)]="currentPartner.email" placeholder="contact@example.com">
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" [(ngModel)]="currentPartner.phone" placeholder="+216 12 345 678">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Mobile</label>
+          <input type="tel" [(ngModel)]="currentPartner.mobile" placeholder="+216 98 765 432">
+        </div>
+
+        <div class="form-group">
+          <label>Address</label>
+          <input type="text" [(ngModel)]="currentPartner.street" placeholder="Street, Avenue...">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" [(ngModel)]="currentPartner.city" placeholder="Tunis">
+          </div>
+          <div class="form-group">
+            <label>Postal Code</label>
+            <input type="text" [(ngModel)]="currentPartner.zip" placeholder="1000">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closePartnerModal()">Cancel</button>
+        <button class="btn-primary" (click)="savePartner()">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Confirm Delete -->
+  <div class="modal-overlay" *ngIf="showDeleteConfirm" (click)="closeDeleteConfirm()">
+    <div class="modal-content modal-small" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Confirm Deletion</h2>
+        <button class="btn-close" (click)="closeDeleteConfirm()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the opportunity <strong>{{ leadToDelete?.name }}</strong> ?</p>
+        <p class="warning-text">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeDeleteConfirm()">Cancel</button>
+        <button class="btn-danger" (click)="deleteLead()">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>

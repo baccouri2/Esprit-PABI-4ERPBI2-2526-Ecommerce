@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Menu Item -->
+        <menuitem id="menu_sql_clients_root" name="SQL Clients" parent="crm.crm_menu_root" sequence="20"/>
+        
+        <menuitem id="menu_sql_clients" name="SQL Server Clients" 
+                  parent="menu_sql_clients_root"
+                  action="action_sql_client_sync" sequence="10"/>
+    </data>
+</odoo>

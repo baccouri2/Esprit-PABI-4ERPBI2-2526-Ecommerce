@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sougui Analytics - Cover Image Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            padding: 40px;
+            color: white;
+        }
+
+        .controls {
+            max-width: 800px;
+            margin: 0 auto 40px;
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #60a5fa;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        .preview {
+            max-width: 100%;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .preview img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .dimension-label {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #60a5fa;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h1>🎨 Sougui Analytics Cover Generator</h1>
+        <p style="color: #94a3b8; margin-bottom: 20px;">Generate perfect cover images in exact dimensions</p>
+        
+        <div class="button-group">
+            <button onclick="generateImage(1920, 1080)">
+                📱 Generate 1920 x 1080
+            </button>
+            <button onclick="generateImage(1080, 720)">
+                📱 Generate 1080 x 720
+            </button>
+        </div>
+
+        <div class="info">
+            ✨ Click a button to generate and download the cover image in exact dimensions!
+        </div>
+    </div>
+
+    <div class="preview" id="preview"></div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        function generateImage(width, height) {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set exact dimensions
+            canvas.width = width;
+            canvas.height = height;
+
+            // Scale factor for text and elements
+            const scale = width / 1920;
+
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, width, height);
+            gradient.addColorStop(0, '#0f1923');
+            gradient.addColorStop(0.5, '#1a2942');
+            gradient.addColorStop(1, '#2d3e5f');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            // Grid pattern
+            ctx.strokeStyle = 'rgba(59, 130, 246, 0.03)';
+            ctx.lineWidth = 1;
+            const gridSize = 50 * scale;
+            for (let x = 0; x < width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+            }
+            for (let y = 0; y < height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+
+            // Decorative circles
+            ctx.strokeStyle = 'rgba(59, 130, 246, 0.2)';
+            ctx.lineWidth = 2 * scale;
+            ctx.beginPath();
+            ctx.arc(width - 200 * scale, -100 * scale, 300 * scale, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(-100 * scale, height + 100 * scale, 250 * scale, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Floating particles
+            const particles = [
+                { x: -50 * scale, y: -50 * scale, size: 150 * scale },
+                { x: width - 100 * scale, y: 100 * scale, size: 100 * scale },
+                { x: width * 0.3, y: height + 40 * scale, size: 125 * scale }
+            ];
+            
+            particles.forEach(p => {
+                const particleGradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+                particleGradient.addColorStop(0, 'rgba(59, 130, 246, 0.15)');
+                particleGradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
+                ctx.fillStyle = particleGradient;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Logo - BIGGER and CENTERED
+            const logoSize = 200 * scale;
+            const logoX = width / 2 - logoSize / 2;
+            const logoY = height / 2 - 150 * scale; // Centered vertically
+            
+            const logoGradient = ctx.createLinearGradient(logoX, logoY, logoX + logoSize, logoY + logoSize);
+            logoGradient.addColorStop(0, '#3b82f6');
+            logoGradient.addColorStop(1, '#8b5cf6');
+            ctx.fillStyle = logoGradient;
+            ctx.shadowColor = 'rgba(59, 130, 246, 0.5)';
+            ctx.shadowBlur = 30 * scale;
+            roundRect(ctx, logoX, logoY, logoSize, logoSize, 40 * scale);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Logo text "S" - BIGGER
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${100 * scale}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('S', width / 2, logoY + logoSize / 2);
+
+            // Title "Sougui" - BIGGER and CENTERED
+            ctx.font = `900 ${90 * scale}px Arial`;
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            const titleY = logoY + logoSize + 70 * scale;
+            ctx.fillText('Sougui', width / 2 - 150 * scale, titleY);
+
+            // Title "Analytics" with gradient - BIGGER
+            const analyticsGradient = ctx.createLinearGradient(
+                width / 2, titleY - 50 * scale,
+                width / 2 + 400 * scale, titleY + 50 * scale
+            );
+            analyticsGradient.addColorStop(0, '#60a5fa');
+            analyticsGradient.addColorStop(0.5, '#a78bfa');
+            analyticsGradient.addColorStop(1, '#f472b6');
+            ctx.fillStyle = analyticsGradient;
+            ctx.fillText('Analytics', width / 2 + 230 * scale, titleY);
+
+            // Subtitle - BIGGER and CENTERED
+            ctx.font = `300 ${32 * scale}px Arial`;
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText('AI-Powered Business Intelligence Platform', width / 2, titleY + 70 * scale);
+
+            // Convert to image and download
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `sougui-analytics-cover-${width}x${height}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                // Show preview
+                const preview = document.getElementById('preview');
+                preview.innerHTML = `
+                    <div class="dimension-label">✅ Downloaded: ${width} x ${height} pixels</div>
+                    <img src="${url}" alt="Preview">
+                `;
+            });
+        }
+
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+    </script>
+</body>
+</html>

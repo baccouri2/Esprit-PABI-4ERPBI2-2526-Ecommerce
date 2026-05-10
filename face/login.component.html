@@ -1,0 +1,307 @@
+<div class="login-page">
+  <!-- Header Actions -->
+  <div class="login-header-actions">
+    <app-language-switcher></app-language-switcher>
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" (click)="toggleTheme()" [title]="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'">
+      <!-- Show SUN icon when in DARK mode (to switch to light) -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" *ngIf="isDarkMode">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+      <!-- Show MOON icon when in LIGHT mode (to switch to dark) -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" *ngIf="!isDarkMode">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="login-card">
+
+    <div class="login-header">
+      <img src="/sougui_logo.png" alt="Sougui" class="login-logo">
+      <h1>{{ translate.translate('login.title') }}</h1>
+      <p>{{ translate.translate('login.subtitle') }}</p>
+    </div>
+
+    <!-- Login Method Toggle -->
+    <div class="login-method-toggle">
+      <button 
+        class="toggle-btn" 
+        [class.active]="loginMethod === 'password'"
+        (click)="switchLoginMethod('password')">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        {{ translate.translate('login.passwordLogin') }}
+      </button>
+      <button 
+        class="toggle-btn" 
+        [class.active]="loginMethod === 'face'"
+        (click)="switchLoginMethod('face')"
+        [disabled]="!faceRecognitionEnabled">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
+          <circle cx="8.5" cy="10.5" r="1.5"></circle>
+          <circle cx="15.5" cy="10.5" r="1.5"></circle>
+          <path d="M12 17.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"></path>
+        </svg>
+        {{ translate.translate('login.faceId') }}
+      </button>
+    </div>
+
+    <!-- Password Login Form -->
+    <div class="login-form" *ngIf="loginMethod === 'password'">
+      <div class="form-group">
+        <label>{{ translate.translate('login.username') }}</label>
+        <input
+          type="text"
+          [(ngModel)]="username"
+          (keydown)="onKey($event)"
+          [placeholder]="translate.translate('login.username')"
+          autocomplete="username"
+          [class.error-input]="error">
+      </div>
+
+      <div class="form-group">
+        <label>{{ translate.translate('login.password') }}</label>
+        <div class="password-wrapper">
+          <input
+            [type]="showPwd ? 'text' : 'password'"
+            [(ngModel)]="password"
+            (keydown)="onKey($event)"
+            [placeholder]="translate.translate('login.password')"
+            autocomplete="current-password"
+            [class.error-input]="error">
+          <button class="toggle-pwd" type="button" (click)="showPwd = !showPwd">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" *ngIf="!showPwd">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" *ngIf="showPwd">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="error-msg" *ngIf="error">
+        <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>{{ error }}</span>
+      </div>
+
+      <button class="login-btn" (click)="login()" [disabled]="loading">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" *ngIf="!loading">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+          <polyline points="10 17 15 12 10 7"></polyline>
+          <line x1="15" y1="12" x2="3" y2="12"></line>
+        </svg>
+        <span *ngIf="!loading">{{ translate.translate('login.signIn') }}</span>
+        <span *ngIf="loading" class="spinner"></span>
+      </button>
+
+      <!-- Register Face Option -->
+      <div class="register-face-option" *ngIf="faceRecognitionEnabled">
+        <p>{{ translate.translate('login.faceRecognition.positionFace') }}</p>
+        <button 
+          class="register-face-btn" 
+          type="button"
+          (click)="openEnrollModal()"
+          [disabled]="!username || !password">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+          {{ translate.translate('login.registerFace') }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Face ID Login Form -->
+    <div class="login-form" *ngIf="loginMethod === 'face'">
+      <div class="form-group">
+        <label>{{ translate.translate('login.username') }}</label>
+        <input
+          type="text"
+          [(ngModel)]="username"
+          [placeholder]="translate.translate('login.username')"
+          autocomplete="username"
+          [class.error-input]="error">
+      </div>
+
+      <div class="error-msg" *ngIf="error">
+        <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>{{ error }}</span>
+      </div>
+
+      <button 
+        class="login-btn face-login-btn" 
+        (click)="openFaceModal()"
+        [disabled]="!username">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
+          <circle cx="8.5" cy="10.5" r="1.5"></circle>
+          <circle cx="15.5" cy="10.5" r="1.5"></circle>
+          <path d="M12 17.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"></path>
+        </svg>
+        <span>{{ translate.translate('login.signInFace') }}</span>
+      </button>
+
+      <div class="face-id-info">
+        <div class="info-item">
+          <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+          <p>{{ translate.translate('login.faceRecognition.positionFace') }}</p>
+        </div>
+        <div class="info-item">
+          <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <p>{{ translate.translate('login.faceRecognition.timeoutInfo') }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-hint">
+      <p>{{ translate.translate('login.availableAccounts') }}</p>
+      <div class="hint-row"><span class="badge ceo">{{ translate.translate('login.ceo') }}</span><code>hedir.zraga&#64;esprit.tn</code></div>
+      <div class="hint-row"><span class="badge sales">{{ translate.translate('login.sales') }}</span><code>sales</code></div>
+      <div class="hint-row"><span class="badge logistics">{{ translate.translate('login.logistics') }}</span><code>logistics</code></div>
+    </div>
+
+  </div>
+
+  <!-- Face Recognition Modal -->
+  <div class="face-modal-overlay" *ngIf="showFaceModal" (click)="closeFaceModal()">
+    <div class="face-modal" (click)="$event.stopPropagation()">
+      <div class="face-modal-header">
+        <h2>
+          <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" *ngIf="enrollMode">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+          <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" *ngIf="verifyMode">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
+            <circle cx="8.5" cy="10.5" r="1.5"></circle>
+            <circle cx="15.5" cy="10.5" r="1.5"></circle>
+            <path d="M12 17.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"></path>
+          </svg>
+          {{ enrollMode ? 'Register Your Face' : 'Verify Your Face' }}
+        </h2>
+        <button class="close-btn" (click)="closeFaceModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="face-modal-body">
+        <!-- Video Stream -->
+        <div class="video-container">
+          <video 
+            #videoElement 
+            class="face-video"
+            [class.face-detected]="detectedFace">
+          </video>
+          <canvas #canvasElement class="face-canvas"></canvas>
+
+          <!-- Face Detection Indicator -->
+          <div class="face-indicator" *ngIf="cameraActive">
+            <div class="indicator-circle" [class.detected]="detectedFace">
+              <svg class="indicator-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" *ngIf="detectedFace">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="indicator-text">
+              {{ detectedFace ? 'Face Detected' : 'No Face Detected' }}
+              <span *ngIf="detectedFace" class="confidence">{{ faceConfidence }}%</span>
+            </div>
+          </div>
+
+          <!-- Countdown Timer (Verification Mode Only) -->
+          <div class="timeout-indicator" *ngIf="verifyMode && cameraActive && timeoutCountdown > 0">
+            <div class="timeout-circle" [class.warning]="timeoutCountdown <= 5">
+              {{ timeoutCountdown }}
+            </div>
+            <div class="timeout-text">seconds remaining</div>
+          </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div class="face-status">
+          <div class="status-msg loading" *ngIf="faceLoading">
+            <span class="spinner-small"></span> Initializing camera...
+          </div>
+          <div class="status-msg error" *ngIf="faceError">
+            <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            {{ faceError }}
+          </div>
+          <div class="status-msg success" *ngIf="faceSuccess">
+            <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            {{ faceSuccess }}
+          </div>
+          <div class="status-msg info" *ngIf="!faceLoading && !faceError && !faceSuccess && cameraActive">
+            <span *ngIf="enrollMode">
+              <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+              <strong>Registration Mode:</strong> Position your face in the frame. Hold still for 2 seconds.
+            </span>
+            <span *ngIf="verifyMode">
+              <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <strong>Verification Mode:</strong> Position your face to verify and login.
+            </span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="face-actions">
+          <button 
+            class="btn-secondary" 
+            (click)="closeFaceModal()"
+            [disabled]="faceLoading">
+            Cancel
+          </button>
+          <button 
+            class="btn-danger" 
+            (click)="clearEnrolledFace()"
+            *ngIf="!enrollMode && !faceLoading"
+            title="Clear enrolled face and re-enroll">
+            Clear Face
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

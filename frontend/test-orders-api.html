@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Orders API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        pre {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Orders API from Frontend</h1>
+    
+    <div class="test-box">
+        <h2>Test 1: Direct Backend Call (Port 5000)</h2>
+        <button onclick="testDirectBackend()">Test Direct Backend</button>
+        <pre id="result1"></pre>
+    </div>
+
+    <div class="test-box">
+        <h2>Test 2: Via Proxy (Port 3000 → 5000)</h2>
+        <button onclick="testViaProxy()">Test Via Proxy</button>
+        <pre id="result2"></pre>
+    </div>
+
+    <div class="test-box">
+        <h2>Test 3: Get Order Statuses</h2>
+        <button onclick="testStatuses()">Test Statuses</button>
+        <pre id="result3"></pre>
+    </div>
+
+    <div class="test-box">
+        <h2>Test 4: Get Specific Order</h2>
+        <input type="number" id="orderId" value="917" placeholder="Order ID">
+        <button onclick="testGetOrder()">Test Get Order</button>
+        <pre id="result4"></pre>
+    </div>
+
+    <script>
+        async function testDirectBackend() {
+            const result = document.getElementById('result1');
+            result.innerHTML = '<span class="info">Testing direct backend call...</span>';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/orders');
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.innerHTML = `<span class="success">✅ SUCCESS</span>\n\n`;
+                    result.innerHTML += `Total orders: ${data.total}\n`;
+                    result.innerHTML += `First 3 orders:\n\n`;
+                    result.innerHTML += JSON.stringify(data.orders.slice(0, 3), null, 2);
+                } else {
+                    result.innerHTML = `<span class="error">❌ ERROR</span>\n\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ ERROR</span>\n\n${error.message}\n\nNote: This might fail due to CORS. Use proxy test instead.`;
+            }
+        }
+
+        async function testViaProxy() {
+            const result = document.getElementById('result2');
+            result.innerHTML = '<span class="info">Testing via proxy...</span>';
+            
+            try {
+                const response = await fetch('/api/orders');
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.innerHTML = `<span class="success">✅ SUCCESS</span>\n\n`;
+                    result.innerHTML += `Total orders: ${data.total}\n`;
+                    result.innerHTML += `First 3 orders:\n\n`;
+                    result.innerHTML += JSON.stringify(data.orders.slice(0, 3), null, 2);
+                } else {
+                    result.innerHTML = `<span class="error">❌ ERROR</span>\n\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ ERROR</span>\n\n${error.message}`;
+            }
+        }
+
+        async function testStatuses() {
+            const result = document.getElementById('result3');
+            result.innerHTML = '<span class="info">Testing statuses...</span>';
+            
+            try {
+                const response = await fetch('/api/orders/statuses');
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.innerHTML = `<span class="success">✅ SUCCESS</span>\n\n`;
+                    result.innerHTML += `Statuses:\n${JSON.stringify(data.statuses, null, 2)}`;
+                } else {
+                    result.innerHTML = `<span class="error">❌ ERROR</span>\n\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ ERROR</span>\n\n${error.message}`;
+            }
+        }
+
+        async function testGetOrder() {
+            const orderId = document.getElementById('orderId').value;
+            const result = document.getElementById('result4');
+            result.innerHTML = '<span class="info">Testing get order...</span>';
+            
+            try {
+                const response = await fetch(`/api/orders/${orderId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.innerHTML = `<span class="success">✅ SUCCESS</span>\n\n`;
+                    result.innerHTML += JSON.stringify(data.order, null, 2);
+                } else {
+                    result.innerHTML = `<span class="error">❌ ERROR</span>\n\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">❌ ERROR</span>\n\n${error.message}`;
+            }
+        }
+
+        // Auto-run proxy test on load
+        window.onload = () => {
+            testViaProxy();
+        };
+    </script>
+</body>
+</html>

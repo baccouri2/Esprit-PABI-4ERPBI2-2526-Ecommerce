@@ -1,0 +1,154 @@
+.ia-assistant {
+  width: 100%;
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+.ia-header {
+  margin-bottom: 24px;
+}
+
+.ia-title-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ia-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, rgba(255,20,147,0.2), rgba(59,130,246,0.2));
+  border: 1px solid rgba(255,20,147,0.3);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FF1493;
+  flex-shrink: 0;
+}
+
+h1 {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 0 4px;
+  background: linear-gradient(135deg, #fff 0%, #FF1493 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.ia-subtitle {
+  color: #8899aa;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+// ── Tab bar ───────────────────────────────────────────────────────────────────
+.tab-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 8px;
+  margin-bottom: 28px;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: #8899aa;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 10px 16px;
+  transition: all 0.2s;
+  white-space: nowrap;
+
+  .tab-icon {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+  }
+
+  &.active {
+    background: linear-gradient(135deg, rgba(255,20,147,0.2), rgba(59,130,246,0.15));
+    border-color: rgba(255,20,147,0.4);
+    color: #FF1493;
+    box-shadow: 0 2px 12px rgba(255,20,147,0.15);
+  }
+}
+
+// ── Tab content ───────────────────────────────────────────────────────────────
+.tab-content {
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .tab-bar { gap: 4px; padding: 6px; }
+  .tab-btn { padding: 8px 12px; font-size: 0.78rem; }
+  .tab-label { display: none; }
+  h1 { font-size: 1.5rem; }
+}
+
+
+// ── Light Theme ───────────────────────────────────────────────────────────────
+:host-context(.light-theme) {
+  .ia-assistant {
+    background: transparent;
+  }
+
+  .ia-icon {
+    background: linear-gradient(135deg, rgba(255,20,147,0.08), rgba(59,130,246,0.08));
+    border-color: rgba(255,20,147,0.2);
+    color: #FF1493;
+  }
+
+  h1 {
+    background: linear-gradient(135deg, #0f172a 0%, #FF1493 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .ia-subtitle {
+    color: #64748b;
+  }
+
+  .tab-bar {
+    background: rgba(0,0,0,0.02);
+    border-color: rgba(0,0,0,0.06);
+  }
+
+  .tab-btn {
+    color: #64748b;
+
+    &:hover {
+      background: rgba(255,20,147,0.04);
+      color: #0f172a;
+    }
+
+    &.active {
+      background: linear-gradient(135deg, rgba(255,20,147,0.12), rgba(59,130,246,0.08));
+      border-color: rgba(255,20,147,0.25);
+      color: #FF1493;
+      box-shadow: 0 2px 12px rgba(255,20,147,0.12);
+    }
+  }
+}
